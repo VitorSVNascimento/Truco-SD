@@ -40,7 +40,7 @@ export default function Chat() {
 
 	useEffect(() => {
 		if (user.id === "0") {
-			if (dialog.current) {
+			if (dialog.current && !dialog.current.open) {
 				dialog.current?.showModal()
 			}
 		}
