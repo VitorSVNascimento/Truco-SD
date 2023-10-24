@@ -14,16 +14,16 @@ export default function ChatMessageInput(props: { onSendMessage: (message: strin
 
 	return (
 		<>
-			<form className="flex items-center gap-3 p-3 bg-slate-300" onSubmit={sendMessage}>
+			<form className="flex items-center gap-3 bg-slate-300 p-3" onSubmit={sendMessage}>
 				<input
-					className="w-full px-5 py-3 rounded-full shadow-sm"
+					className="w-full rounded-full px-5 py-3 shadow-sm"
 					type="text"
 					placeholder="Digite sua mensagem"
 					value={message}
 					onChange={(e) => setMessage(e.target.value)}
 				/>
 				<button
-					className="flex p-3 rounded-full shadow-sm bg-green-400 hover:bg-green-600 disabled:bg-green-300 text-gray-50 focus-within:outline focus-within:outline-green-700"
+					className="flex rounded-full bg-green-400 p-3 text-gray-50 shadow-sm focus-within:outline focus-within:outline-green-700 hover:bg-green-600 disabled:bg-green-300"
 					type="submit"
 					disabled={!message}
 				>

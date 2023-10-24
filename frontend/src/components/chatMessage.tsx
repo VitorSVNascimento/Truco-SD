@@ -3,7 +3,7 @@ import { Message, User } from "../types/types"
 export default function ChatMessage(props: { message: Message; user: User }) {
 	return (
 		<div
-			className={`flex flex-col w-fit p-2 my-0.5 rounded-md ${
+			className={`my-0.5 flex w-fit flex-col rounded-md p-2 ${
 				props.message.userId === props.user?.id ? "self-end bg-green-400" : "bg-white"
 			}`}
 		>

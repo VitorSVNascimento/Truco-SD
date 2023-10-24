@@ -88,7 +88,7 @@ export default function Chat() {
 	return (
 		<>
 			<UserModal ref={dialog} onUserChange={handleUserChange} socket={socket} />
-			<div className="flex flex-col min-h-screen max-h-screen">
+			<div className="flex max-h-screen min-h-screen flex-col">
 				<ChatMessages messages={messages} user={user} ref={messagesDivRef} />
 				<ChatMessageInput onSendMessage={handleSendMessage} />
 			</div>
