@@ -1,3 +1,27 @@
+CARDS_WEIGHT = {
+    '4C': 14, '7H': 13, 'AS': 12, '7D': 11, # Special cards
+
+    '3S': 10, '3D': 10, '3C': 10, '3H': 10,
+    '2S': 9, '2D': 9, '2C': 9, '2H': 9,
+    'AD': 8, 'AC': 8, 'AH': 8,
+    'KS': 7, 'KD': 7, 'KC': 7, 'KH': 7,
+    'JS': 6, 'JD': 6, 'JC': 6, 'JH': 6,
+    'QS': 5, 'QD': 5, 'QC': 5, 'QH': 5,
+    '7S': 4, '7C': 4,
+    '6S': 3, '6D': 3, '6C': 3, '6H': 3,
+    '5S': 2, '5D': 2, '5C': 2, '5H': 2,
+    '4S': 1, '4D': 1, '4H': 1
+}
+
+VALID_CARD_CODES = [
+    'AS', '2S', '3S', '4S', '5S', '6S', '7S', 'JS', 'QS', 'KS',
+    'AD', '2D', '3D', '4D', '5D', '6D', '7D', 'JD', 'QD', 'KD',
+    'AC', '2C', '3C', '4C', '5C', '6C', '7C', 'JC', 'QC', 'KC',
+    'AH', '2H', '3H', '4H', '5H', '6H', '7H', 'JH', 'QH', 'KH'
+]
+
+SUITS = {'S': 'SPADES', 'D': 'DIAMONDS', 'H': 'HEARTS', 'C': 'CLUBS'}
+
 class Card:
     """
     Representa uma carta de um baralho de Truco.
@@ -13,47 +37,20 @@ class Card:
         Esta exceção é lançada quando um código de carta não é encontrado na lista de cartas válidas.
         """
         def __init__(self, card_code):
-            self.message = "Invalid card code"
+            self.message = f"Invalid card code: {card_code}"
             super().__init__(self.message)
 
 
-    CARDS = ['AS', '2S', '3S', '4S', '5S', '6S', '7S', 'JS', 'QS', 'KS',
-         'AD', '2D', '3D', '4D', '5D', '6D', '7D', 'JD', 'QD', 'KD',
-         'AC', '2C', '3C', '4C', '5C', '6C', '7C', 'JC', 'QC', 'KC',
-         'AH', '2H', '3H', '4H', '5H', '6H', '7H', 'JH', 'QH', 'KH']
-    
-    
+
     def __init__(self, code: str):
-        if code not in Card.CARDS:
-            raise Card.InvalidCardException(f"Código de carta inválido: {code}")
+        if code not in VALID_CARD_CODES:
+            raise Card.InvalidCardException(code)
         
         self.code = code
-        self.weight = Card.calculate_card_weigth(code)
+        self.weight = CARDS_WEIGHT[code]
+        self.value = code[:1]
+        self.suit = SUITS[code[1:]]
 
-
-    @staticmethod
-    def calculate_card_weigth(code: str) -> int:
-        """
-        Calcula o peso de uma carta de baralho com base em seu código.
-        :param code: Uma string representando o código da carta, por exemplo, '3S' para 3 de Espadas.
-        :return: Um inteiro representando o peso da carta. Retorna -1 se o código da carta não for encontrado.
-        """ 
-        if code not in Card.CARDS:
-            return -1
-        
-        manilhas = ['4C', '7H', 'AS', '7D']
-        values = {'3': 10, '2': 9, 'A': 8, 'K': 7, 'J': 6, 'Q': 5, '7': 4, '6': 3, '5': 2, '4': 1}
-
-        card_value = code[:-1]
-
-        if code in manilhas:
-            return len(manilhas) - manilhas.index(code) + 10
-        elif card_value in values:
-            return values[card_value]
-        else:
-            return -1
-        
-    
     def get_img_url(self) -> str:
         """
         Retorna a URL de uma imagem da carta com base em seu código.
@@ -61,22 +58,36 @@ class Card:
         """
         return f"https://deckofcardsapi.com/static/img/{self.code}.png"
     
+    def __le__(self, other_card: 'Card') -> bool:
+        if isinstance(other_card, Card):
+            return self.weight <= other_card.weight 
+        else:
+            raise TypeError(f'Object {other_card} is not a Card object')
     
-    def compare_to(self, card: 'Card') -> int:
-        """
-        Compara o peso desta carta com o peso de outra carta.
-        :param card: Um objeto da classe 'Card' para comparar com esta carta.
-        :return: Um valor inteiro que indica a relação de pesos entre as cartas.
-                 - 0 se as cartas têm o mesmo peso.
-                 - 1 se esta carta tem um peso maior que a carta passada como parâmetro.
-                 - -1 se esta carta tem um peso menor que a carta passada como parâmetro.
-        """
-        if self.weight == card.weight:
-            return 0
+    def __lt__(self, other_card: 'Card') -> bool:
+        if isinstance(other_card, Card):
+            return self.weight < other_card.weight
+        else:
+            raise TypeError(f'Object {other_card} is not a Card object')
         
-        return 1 if self.weight > card.weight else -1
-    
-
+    def __ge__(self, other_card: 'Card') -> bool:
+        if isinstance(other_card, Card):
+            return self.weight >= other_card.weight
+        else:
+            raise TypeError(f'Object {other_card} is not a Card object')
+        
+    def __gt__(self, other_card: 'Card') -> bool:
+        if isinstance(other_card, Card):
+            return self.weight > other_card.weight
+        else:
+            raise TypeError(f'Object {other_card} is not a Card object')
+        
+    def __eq__(self, other_card: 'Card') -> bool:
+        if isinstance(other_card, Card):
+            return self.weight == other_card.weight
+        else:
+            raise TypeError(f'Object {other_card} is not a Card object')
+        
     def to_json(self):
         """
         Converte os atributos da carta em um dicionário JSON.
@@ -84,6 +95,8 @@ class Card:
         """
         return {
             'code': self.code,
-            'weight': self.weight
+            'weight': self.weight,
+            'value' : self.value,
+            'suit' : self.suit
         }    
         
