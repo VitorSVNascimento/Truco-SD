@@ -1,6 +1,5 @@
 from api.models.team import Team
 from .player import Player
-from server.instance import server
 
 TEAM_ONE = 1
 TEAM_TWO = 2
