@@ -14,7 +14,7 @@ games = []
 def get_next_id():
     if len(games) == 0:
         return 1
-    return games[-1].get_id() + 1
+    return games[-1].id + 1
 
 # @api.route('/games')
 # class GameList(Resource):

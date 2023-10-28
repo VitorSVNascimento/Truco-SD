@@ -1,4 +1,4 @@
-from api.models.card import Card
+from models.card import Card
 from typing import List
 
 class Player:
@@ -8,9 +8,10 @@ class Player:
     A classe `Player` contém informações sobre o jogador, incluindo seu ID, nome e as cartas em sua mão.
     """
     
-    def __init__(self, id: int, name: str, cards: List[Card] = []):
+    def __init__(self, id: int, name: str, sid:str,cards: List[Card] = []):
         self.id = id
         self.name = name
+        self.sid = sid
         self.cards = cards
 
     def throw_card_using_code(self, card_code: str) -> Card:

@@ -1,4 +1,4 @@
-from api.models.team import Team
+from models.team import Team
 from .player import Player
 
 TEAM_ONE = 1
@@ -8,7 +8,7 @@ class Game:
     def __init__(self, id: int, owner: Player):
         self.id = id
         self.owner = owner
-        self.teams = [Team(TEAM_ONE), Team(TEAM_TWO)]
+        self.teams = [Team(TEAM_ONE,[self.owner]), Team(TEAM_TWO)]
         self.next_player_id = owner.id
 
     def start():

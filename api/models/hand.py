@@ -1,6 +1,4 @@
-from api.models.player import Player
-
-
+from models.player import Player
 
 ''' Valor base (tentos) de uma mão '''
 BASE_HAND_VALUE = 2

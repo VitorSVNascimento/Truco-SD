@@ -1,6 +1,6 @@
 from typing import List
-from api.models.hand import BASE_HAND_VALUE
-from api.models.player import Player
+from models.hand import BASE_HAND_VALUE
+from models.player import Player
 
 ''' O número máximo de jogadores permitidos em um time. '''
 MAX_PLAYERS = 2
@@ -19,7 +19,7 @@ class Team:
             self.message = f"Maximum number of players exceeded. {Team.MAX_PLAYERS} players maximum!"
             super().__init__(self.message)
 
-    def __init__(self, id: int, players: List[Player] = None):
+    def __init__(self, id: int, players: List[Player] = []):
         self.id = id
 
         if len(players) > MAX_PLAYERS:

@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Chat Room</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
+</head>
+<body>
+    <input type="text" id="username" placeholder="Username">
+    <input type="text" id="room" placeholder="Room">
+    <button id="createbutton">Create Romm</button>
+    <button id="joinbutton">Join Room</button>
+    <ul id="messages"></ul>
+    <input type="text" id="myMessage">
+    <button id="sendbutton">Send</button>
+
+<script type="text/javascript">
+$(document).ready(function() {
+
+    var socket = io.connect('http://127.0.0.1:22000');
+
+    $('#joinbutton').on('click', function() {
+        var username = $('#username').val();
+        var room = $('#room').val();
+        socket.emit('connect_game', {username: username, room: room});
+    });
+
+    $('#createbutton').on('click', function() {
+        var username = $('#username').val();
+        socket.emit('create_game', {username: username});
+    });
+
+    socket.on('room_message', function(msg) {
+        $("#messages").append('<li>'+msg+'</li>');
+        console.log('Received message');
+    });
+
+    $('#sendbutton').on('click', function() {
+        var room = $('#room').val();
+        socket.emit('send message', {message: $('#myMessage').val(),room : room});
+        $('#myMessage').val('');
+    });
+
+});
+</script>
+
+</body>
+</html>
