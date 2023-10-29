@@ -21,6 +21,7 @@ export default function ChatMessageInput(props: { onSendMessage: (message: strin
 					placeholder="Digite sua mensagem"
 					value={message}
 					onChange={(e) => setMessage(e.target.value)}
+					autoFocus
 				/>
 				<button
 					className="flex rounded-full bg-green-400 p-3 text-gray-50 shadow-sm focus-within:outline focus-within:outline-green-700 hover:bg-green-600 disabled:bg-green-300"

@@ -7,5 +7,6 @@ export interface Message {
 
 export interface User {
     id: string,
-    name: string
+    username: string,
+    room?: string
 }
