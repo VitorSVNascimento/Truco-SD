@@ -1,4 +1,3 @@
-from cgi import print_arguments
 from flask import Flask, request
 from flask_socketio import SocketIO, join_room, emit
 from server.instance import server
@@ -82,7 +81,7 @@ def start(data):
     id = int(data['room'])
     print("Opa")
     games[id - 1].start()
-    
+
 
 @server.socketio.on('send message')
 def send_room_message(data):
