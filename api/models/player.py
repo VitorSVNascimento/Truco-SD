@@ -8,7 +8,7 @@ class Player:
     A classe `Player` contém informações sobre o jogador, incluindo seu ID, nome e as cartas em sua mão.
     """
     
-    def __init__(self, id: int, name: str, sid:str,cards: List[Card] = []):
+    def __init__(self, id: int, name: str, sid: str, cards: List[Card] = []):
         self.id = id
         self.name = name
         self.sid = sid

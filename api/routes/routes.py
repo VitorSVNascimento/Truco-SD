@@ -16,6 +16,12 @@ def get_next_id():
         return 1
     return games[-1].id + 1
 
+
+def  check_game_by_id(id: int) -> bool:
+    if id in [game.id for game in games]:
+        return True
+    return False
+
 # @api.route('/games')
 # class GameList(Resource):
 #     def get(self,):

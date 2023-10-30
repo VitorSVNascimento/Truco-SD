@@ -8,8 +8,18 @@
 <body>
     <input type="text" id="username" placeholder="Username">
     <input type="text" id="room" placeholder="Room">
-    <button id="createbutton">Create Romm</button>
+    <label for="team">Time:</label>
+
+    <select name="team" id="team">
+        <option value="1">1</option>
+        <option value="2">2</option>
+        <option value="3">Qualquer um</option>
+    </select>
+
+    <button id="createbutton">Create Room</button>
     <button id="joinbutton">Join Room</button>
+    <button id="startbutton">Start Room</button>
+
     <ul id="messages"></ul>
     <input type="text" id="myMessage">
     <button id="sendbutton">Send</button>
@@ -22,7 +32,13 @@ $(document).ready(function() {
     $('#joinbutton').on('click', function() {
         var username = $('#username').val();
         var room = $('#room').val();
-        socket.emit('connect_game', {username: username, room: room});
+        var team = $('#team').val();
+        socket.emit('connect_game', {username: username, room: room, team: team});
+    });
+
+    $('#startbutton').on('click', function() {
+        var room = $('#room').val();
+        socket.emit('start_game', {room: room});
     });
 
     $('#createbutton').on('click', function() {
