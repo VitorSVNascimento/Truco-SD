@@ -1,0 +1,126 @@
+asyncapi: 2.5.0
+channels:
+  /:
+    publish:
+      message:
+        oneOf:
+        - $ref: '#/components/messages/Create_Game'
+        - $ref: '#/components/messages/Connect_Game'
+    subscribe:
+      message:
+        oneOf:
+        - $ref: '#/components/messages/game_created'
+        - $ref: '#/components/messages/connect_successfully'
+    x-handlers:
+      disconnect: disconnect
+components:
+  messages:
+    Connect_Game:
+      description: ''
+      name: connect_game
+      payload:
+        $ref: '#/components/schemas/ConnectGameData'
+        deprecated: false
+    Create_Game:
+      description: ''
+      name: create_game
+      payload:
+        $ref: '#/components/schemas/CreateGameData'
+        deprecated: false
+    connect_successfully:
+      description: Sucesso ao se conectar ao jogo
+      name: connect_successfully
+      payload:
+        $ref: '#/components/schemas/ConnectSuccessfully'
+        deprecated: false
+    game_created:
+      description: Sucesso ao criar o jogo
+      name: game_created
+      payload:
+        $ref: '#/components/schemas/GameCreatedSuccessfully'
+        deprecated: false
+  schemas:
+    ConnectGameData:
+      description: "Mensagem para se conectar a um jogo j\xE1 criado.\n\nreturn: uma\
+        \  mensagem de acordo com o modelo ConnectSuccessfully"
+      properties:
+        room:
+          description: "Id do jogo que o usu\xE1rio deseja se conectar"
+          title: Sala
+          type: integer
+        username:
+          description: "Nome do usu\xE1rio que deseja se conectar ao jogo"
+          title: "Nome do usu\xE1rio"
+          type: string
+      required:
+      - username
+      - room
+      title: ConnectGameData
+      type: object
+    ConnectSuccessfully:
+      description: "Mensagem que representa sucesso na conex\xE3o a um jogo"
+      properties:
+        room:
+          description: "Id do jogo em que o usu\xE1rio se conectou"
+          title: Sala
+          type: integer
+        team_id:
+          description: "Id do time em que o usu\xE1rio vai jogar"
+          title: Id do time
+          type: integer
+        username:
+          description: "Nome do usu\xE1rio que se conectou ao jogo"
+          title: "Nome do usu\xE1rio"
+          type: string
+      required:
+      - username
+      - room
+      - team_id
+      title: ConnectSuccessfully
+      type: object
+    CreateGameData:
+      description: 'Mensagem para criar um novo jogo
+
+
+        return: uma  mensagem de acordo com o modelo GameCreatedSuccessfully'
+      properties:
+        username:
+          description: "Nome do usu\xE1rio que deseja criar o novo jogo"
+          title: "Nome do Usu\xE1rio"
+          type: string
+      required:
+      - username
+      title: CreateGameData
+      type: object
+    GameCreatedSuccessfully:
+      description: "Mensagem que representa a cria\xE7\xE3o de um jogo com sucesso."
+      properties:
+        room:
+          description: Id da novo jogo criado
+          title: Sala
+          type: integer
+      required:
+      - room
+      title: GameCreatedSuccessfully
+      type: object
+    NoSpec:
+      deprecated: false
+      description: Specification is not provided
+info:
+  description: 'API para gerenciar partidas de truco
+
+    <br/> AsyncAPI currently does not support Socket.IO binding and Web Socket like
+    syntax used for now.
+
+    In order to add support for Socket.IO ACK value, AsyncAPI is extended with with
+    x-ack keyword.
+
+    This documentation should **NOT** be used for generating code due to these limitations.
+
+    '
+  title: Truco API
+  version: 1.0.0
+servers:
+  TRUCO_API_BACKEND:
+    protocol: socketio
+    url: http://127.0.0.1:22000

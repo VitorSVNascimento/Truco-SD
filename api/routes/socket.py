@@ -60,7 +60,7 @@ def join(data):
                 
                 # Entrou no time
                 server.socketio.emit(
-                    'room_message', f'{username} has intered on room {id} on team {team.id}', to=id)
+                    'connect_successfully', {'username':username,'room':id,'team_id':team.id}, to=id)
                 
             else:
                 # Time cheio
@@ -74,7 +74,6 @@ def join(data):
         # Sala inexistente
         server.socketio.emit(
             'room_message', f'Room {id} does not exist.', to=request.sid)
-
 
 @server.socketio.on('start_game')
 def start(data):
