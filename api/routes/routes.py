@@ -10,49 +10,6 @@ import pathlib
 
 app,api = server.app,server.api
 
-games = []
-
-def get_next_id():
-    if len(games) == 0:
-        return 1
-    return games[-1].id + 1
-
-
-def  check_game_by_id(id: int) -> bool:
-    if id in [game.id for game in games]:
-        return True
-    return False
-
-# @api.route('/games')
-# class GameList(Resource):
-#     def get(self,):
-#         return make_response(
-#             jsonify(
-#                 [game.to_json() for game in games]
-#                 )
-#             )
-#     def post(self,):
-#         response = api.payload
-#         print(response)
-
-#         return make_response(
-#             jsonify(
-#                 [game.to_json() for game in games]
-#                 )
-#             )
-    
-@api.route('/createGame')
-class CreateGame(Resource):
-    @api.expect(new_game,validate=True)
-    @api.marshal_with(new_game_return)
-    def post(self,):
-        response = api.payload
-        id = get_next_id()
-        games.append(Game(id,Player(1,response['player_name'])))
-
-
-        return {'game_id' : id},200
-
 @app.route('/docstr',methods=['GET'])
 def send_doc_str():
     doc_path = pathlib.Path(__file__).parent / "../documentation/socketdoc.yaml"
