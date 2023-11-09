@@ -20,6 +20,7 @@ def create(data):
     id = game_list.get_next_id()
     players.append(1)
     game_list.games.append(Game(id, Player(len(players), username, request.sid)))
+    game_list.sids[request.sid] = id
     join_room(id)
     server.socketio.emit(
         'room_message', f'{username} has created and intered on room {id} on team 1', to=id)
@@ -55,6 +56,7 @@ def join(data):
         # Verifica se a sala está cheia.
         if not game_list.games[id - 1].is_full():
             team = game_list.games[id - 1].add_player(Player(len(players), username, request.sid), team_id if team_id == TEAM_ONE or team_id == TEAM_TWO else None)
+            game_list.sids[request.sid] = id
             if team:
                 join_room(id)
                 
@@ -62,12 +64,12 @@ def join(data):
                 server.socketio.emit(
                     'connect_successfully', {'username':username,'room':id,'team_id':team.id}, to=id)
                 server.socketio.emit(
-                    'room_message', {'username':username,'room':id,'team_id':team.id}, to=id)
+                    'room_message', f'{username} has created and intered on room {id} on team {team}', to=id)
                 
             else:
                 # Time cheio
                 server.socketio.emit(
-                    'room_message', f'Team {team_id} on room {id} is full.', to=request.sid)
+                    'room_message', f'Team {team_id} on room {id} is full', to=request.sid)
         else:
             # Sala cheia
             server.socketio.emit(
@@ -78,8 +80,8 @@ def join(data):
             'room_message', f'Room {id} does not exist.', to=request.sid)
 
 @server.socketio.on('start_game')
-def start(data):
-    id = int(data['room'])
+def start():
+    id = game_list.sids[request.sid]
     print("Opa")
     game_list.games[id - 1].start()
     print(game_list.games[id - 1].to_json())
@@ -87,7 +89,7 @@ def start(data):
 
 @server.socketio.on('send message')
 def send_room_message(data):
-    room = int(data['room'])
+    room = game_list.sids[request.sid]
     message = data['message']
     print(server.socketio.server.manager.rooms)
     emit('room_message', message, to=room)

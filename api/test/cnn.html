@@ -39,7 +39,7 @@ $(document).ready(function() {
 
     $('#startbutton').on('click', function() {
         var room = $('#room').val();
-        socket.emit('start_game', {room: room});
+        socket.emit('start_game');
     });
 
     $('#createbutton').on('click', function() {

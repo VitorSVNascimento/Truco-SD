@@ -94,7 +94,9 @@ class Game:
         used_names = []
         while not self.is_full():
             bot_name = Bot.get_random_bot_name(used_names)
+            used_names.append(bot_name)
             self.add_player(Bot(id_gen, bot_name))
+
 
     def is_started(self) -> bool:
         """

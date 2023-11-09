@@ -2,6 +2,7 @@
 class GameList:
     def __init__(self):
         self.games = []
+        self.sids = {}
     
     def get_next_id(self):
         if len(self.games) == 0:
