@@ -33,6 +33,7 @@ $(document).ready(function() {
         var username = $('#username').val();
         var room = $('#room').val();
         var team = $('#team').val();
+        console.log("room="+room);
         socket.emit('connect_game', {username: username, room: room, team: team});
     });
 

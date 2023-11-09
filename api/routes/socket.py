@@ -61,6 +61,8 @@ def join(data):
                 # Entrou no time
                 server.socketio.emit(
                     'connect_successfully', {'username':username,'room':id,'team_id':team.id}, to=id)
+                server.socketio.emit(
+                    'room_message', {'username':username,'room':id,'team_id':team.id}, to=id)
                 
             else:
                 # Time cheio
@@ -80,6 +82,7 @@ def start(data):
     id = int(data['room'])
     print("Opa")
     games[id - 1].start()
+    print(games[id - 1].to_json())
 
 
 @server.socketio.on('send message')

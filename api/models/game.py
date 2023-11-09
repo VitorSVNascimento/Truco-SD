@@ -149,7 +149,7 @@ class Game:
 
     def to_json(self):
         return {
-            'id':self.__id,
-            'owner':self.__owner.to_json(),
+            'id':self.id,
+            'owner':self.owner.to_json(),
             'teams':[team.to_json() for team in self.teams]
         }
