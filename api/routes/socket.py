@@ -98,28 +98,22 @@ def start():
     if request.sid == game_list.games[id - 1].owner.sid:
         game_list.games[id - 1].start()
         print(game_list.games[id - 1].to_json())
-        players = []
-        for team in game_list.games[id - 1].teams:
-            for player in team.players:
-                players.append(player)
+        [server.socketio.emit('your_cards',{'cards':player.cards_to_json()},to=player.sid) for player in game_list.games[id - 1].player_order if not player.name.startswith('BOT')]
 
-        [server.socketio.emit('your_cards',{'cards':player.cards},to=player.sid) for player in players if not player.name.startswith('BOT')]
+        
     server.socketio.emit(
     'room_message', f'Apenas o dono pode iniciar a partida', to=request.sid)
 
 @server.socketio.on('throw_card')
 def throw(data):
     id = game_list.sids[request.sid]
-    card = data['card_code']
-
-    for team in game_list.games[id - 1].teams:
-        for player in team.players:
-            if player.sid == request.sid:
-                result = player.throw_card_using_code(card)
-                if result == None:
-                    pass
-                else:
-                    server.socketio.emit("throwed_card", {'username' : player.name, 'card_code' : card}, to=id)
+    card_code = data['card_code']
+    print(f'Codígo da carta = {card_code}')
+    for player in game_list.games[id - 1].player_order:
+        if player.sid == request.sid:
+            result = player.throw_card_using_code(card_code)
+            if result is not None:
+                server.socketio.emit("throwed_card", {'username' : player.name, 'card_code' : card_code}, to=id)
 
 @server.socketio.on('send message')
 def send_room_message(data):

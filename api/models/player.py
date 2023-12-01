@@ -1,5 +1,4 @@
 from models.card import Card
-from typing import List
 
 class Player:
     """
@@ -8,7 +7,7 @@ class Player:
     A classe `Player` contém informações sobre o jogador, incluindo seu ID, nome e as cartas em sua mão.
     """
     
-    def __init__(self, id: int, name: str, sid: str, cards: List[Card] = []):
+    def __init__(self, id: int, name: str, sid: str, cards: list[Card] = []):
         self.id = id
         self.name = name
         self.sid = sid
@@ -21,12 +20,11 @@ class Player:
         :return: Um objeto da classe 'Card' que foi removido da mão do jogador, ou None se a carta não for encontrada.
         """
         print("chegou no card")
-        print(self.cards)
-        for card in self.cards['cards']:
-            print(card)
-            if card['code'] == card_code:
-                self.cards['remaining'] = int(self.cards['remaining']) - 1
-                return self.cards['cards'].pop(self.cards['cards'].index(card))
+        for index, card in enumerate(self.cards):
+            print(card.to_json())
+            if card.code == card_code.upper():
+                print('Não retornou None')
+                return self.cards.pop(index)
         return None
     
     def throw_card(self, card: Card) -> Card:
@@ -49,5 +47,10 @@ class Player:
         return {
             'id': self.id,
             'name': self.name,
-            'cards': self.cards
+            'cards': self.cards_to_json()
+        }
+
+    def cards_to_json(self):
+        return {
+            'cards': [card.to_json() for card in self.cards]
         }    
