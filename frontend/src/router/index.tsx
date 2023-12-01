@@ -1,7 +1,8 @@
 import { createBrowserRouter } from "react-router-dom"
-import Home from "../views/home"
-import Chat from "../views/chat"
-import ErrorPage from "../views/errorPage"
+import Home from "../views/Home"
+import ErrorPage from "../views/ErrorPage"
+import Chat from "../views/Chat"
+import WaitRoom from "../views/WaitRoom"
 
 const router = createBrowserRouter([
 	{
@@ -12,6 +13,10 @@ const router = createBrowserRouter([
 	{
 		path: "/chat",
 		element: <Chat />,
+	},
+	{
+		path: "/waitRoom",
+		element: <WaitRoom />,
 	},
 ])
 

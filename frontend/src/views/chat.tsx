@@ -1,8 +1,8 @@
 import { useState, useRef, useEffect, useContext } from "react"
 import { useNavigate } from "react-router-dom"
 import { Message } from "../types/types"
-import ChatMessageInput from "../components/chat/chatMessageInput"
-import ChatMessages from "../components/chat/chatMessages"
+import ChatMessageInput from "../components/chat/ChatMessageInput"
+import ChatMessages from "../components/chat/ChatMessages"
 import SocketContext from "../contexts/SocketContext"
 import { UserContext } from "../contexts/UserContext"
 

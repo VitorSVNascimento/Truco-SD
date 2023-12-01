@@ -24,6 +24,10 @@ export default function Home() {
 		} else {
 			socket.connect()
 
+			socket.on("connect_succesfully", (data: any) => {
+				console.log({ data })
+			})
+
 			socket.on("connect", () => {
 				console.log("Connected handle", socket)
 
@@ -49,6 +53,10 @@ export default function Home() {
 			connectGame(room)
 		} else {
 			socket.connect()
+
+			socket.on("connect_succesfully", (data: any) => {
+				console.log({ data })
+			})
 
 			socket.on("connect", () => {
 				console.log("Connected handle", socket)
@@ -94,7 +102,7 @@ export default function Home() {
 			room,
 		})
 		socket.emit("connect_game", { username, room })
-		navigate("/chat")
+		navigate("/waitRoom")
 	}
 
 	useEffect(() => {
@@ -135,7 +143,7 @@ export default function Home() {
 				username,
 				room: data.room,
 			})
-			navigate("/chat")
+			navigate("/waitRoom")
 		}
 
 		socket.on("game_created", handleGameCreated)

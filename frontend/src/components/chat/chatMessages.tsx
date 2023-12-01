@@ -1,6 +1,6 @@
 import React, { useContext, useEffect } from "react"
 import { useNavigate } from "react-router-dom"
-import ChatMessage from "./chatMessage"
+import ChatMessage from "./ChatMessage"
 import { Message } from "../../types/types"
 import { UserContext } from "../../contexts/UserContext"
 
