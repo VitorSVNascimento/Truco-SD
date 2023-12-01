@@ -1,7 +1,7 @@
-
+from models.game import Game
 class GameList:
     def __init__(self):
-        self.games = []
+        self.games: list[Game] = []
         self.sids = {}
     
     def get_next_id(self):
