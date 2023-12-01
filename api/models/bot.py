@@ -10,7 +10,7 @@ BOT_NAMES = [
     "BOT Antônio do Petisco",
     "BOT Carlinhos da Rocha",
     "BOT Lúcia do Chopp",
-    "BOT Toninho do Tira-Gosto",
+    "BOT Toninho do TiraGosto",
     "BOT Linus Torvaldespacho do Samba",
     "BOT Seu Jorge da Feijoada",
     "BOT Mariana da Caipirinha",

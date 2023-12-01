@@ -143,9 +143,10 @@ class Game:
         response = Requests.show_cards_pile(deck_id, players[0].name)
         if Requests.is_response_sucessful(response):
             for player in players:
-                response['piles'][player.name] = players_cards[player.name]
+                player.cards = players_cards[player.name]
+                # response['piles'][player.name] = players_cards[player.name]
         
-        print(response)
+        [print(player.to_json) for player in players]
             
         return response
 

@@ -91,7 +91,6 @@ def start():
 def send_room_message(data):
     room = game_list.sids[request.sid]
     message = data['message']
-    print(server.socketio.server.manager.rooms)
     emit('room_message', message, to=room)
 
 
