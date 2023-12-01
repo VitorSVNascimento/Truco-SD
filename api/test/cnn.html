@@ -52,6 +52,11 @@ $(document).ready(function() {
         console.log('Received message');
     });
 
+    socket.on('your_cards',function(msg){
+        $("#messages").append('<li>'+msg+'</li>');
+        console.log(msg);
+    })
+
     $('#sendbutton').on('click', function() {
         var room = $('#room').val();
         socket.emit('send message', {message: $('#myMessage').val(),room : room});

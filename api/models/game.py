@@ -35,7 +35,7 @@ class Game:
 
         self.__create_players_piles(self.deck['deck_id'], self.player_order)
         
-
+        
         self.started = True
 
         
@@ -146,7 +146,6 @@ class Game:
                 player.cards = players_cards[player.name]
                 # response['piles'][player.name] = players_cards[player.name]
         
-        [print(player.to_json) for player in players]
             
         return response
 

@@ -85,6 +85,13 @@ def start():
     print("Opa")
     game_list.games[id - 1].start()
     print(game_list.games[id - 1].to_json())
+    players = []
+    for team in game_list.games[id - 1].teams:
+        for player in team.players:
+            players.append(player)
+
+    [server.socketio.emit('your_cards',{'cards':player.cards},to=player.sid) for player in players if not player.name.startswith('BOT')]
+    
 
 
 @server.socketio.on('send message')
