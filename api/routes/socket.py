@@ -22,11 +22,17 @@ def create(data):
     game_list.games.append(Game(id, Player(len(players), username, request.sid)))
     game_list.sids[request.sid] = id
     join_room(id)
+    team_userNames = []
+    for team in game_list.games[id - 1].teams:
+        team_list = []
+        for player in team.players:
+            team_list.append(player.name)  
+        team_userNames.append(team_list)
+
     server.socketio.emit(
-        'room_message', f'{username} has created and intered on room {id} on team 1', to=id)
+        'room_message', {'username' : username, 'message' : f'{username} has created and intered on room {id} on team 1'}, to=id)
     server.socketio.emit(
-        'game_created', {'room': id}, to=request.sid
-    )
+        'connect_successfully', {'players':team_userNames,'room':id}, to=id)
 
 # @server.socketio.on('connect_game')
 # def create(data):
@@ -55,16 +61,23 @@ def join(data):
         
         # Verifica se a sala está cheia.
         if not game_list.games[id - 1].is_full():
-            team = game_list.games[id - 1].add_player(Player(len(players), username, request.sid), team_id if team_id == TEAM_ONE or team_id == TEAM_TWO else None)
+            playName = game_list.games[id - 1].add_player(Player(len(players), username, request.sid), team_id if team_id == TEAM_ONE or team_id == TEAM_TWO else None)
             game_list.sids[request.sid] = id
-            if team:
+            if playName:
                 join_room(id)
                 
+                team_userNames = []
+                for team in game_list.games[id - 1].teams:
+                    team_list = []
+                    for player in team.players:
+                      team_list.append(player.name)  
+                    team_userNames.append(team_list)
                 # Entrou no time
                 server.socketio.emit(
-                    'connect_successfully', {'username':username,'room':id,'team_id':team.id}, to=id)
+
+                    'connect_successfully', {'players':team_userNames,'room':id}, to=id)
                 server.socketio.emit(
-                    'room_message', f'{username} has created and intered on room {id} on team {team}', to=id)
+                    'room_message', f'{playName} has created and intered on room {id} ', to=id)
                 
             else:
                 # Time cheio
@@ -82,17 +95,31 @@ def join(data):
 @server.socketio.on('start_game')
 def start():
     id = game_list.sids[request.sid]
-    print("Opa")
-    game_list.games[id - 1].start()
-    print(game_list.games[id - 1].to_json())
-    players = []
+    if request.sid == game_list.games[id - 1].owner.sid:
+        game_list.games[id - 1].start()
+        print(game_list.games[id - 1].to_json())
+        players = []
+        for team in game_list.games[id - 1].teams:
+            for player in team.players:
+                players.append(player)
+
+        [server.socketio.emit('your_cards',{'cards':player.cards},to=player.sid) for player in players if not player.name.startswith('BOT')]
+    server.socketio.emit(
+    'room_message', f'Apenas o dono pode iniciar a partida', to=request.sid)
+
+@server.socketio.on('throw_card')
+def throw(data):
+    id = game_list.sids[request.sid]
+    card = data['card_code']
+
     for team in game_list.games[id - 1].teams:
         for player in team.players:
-            players.append(player)
-
-    [server.socketio.emit('your_cards',{'cards':player.cards},to=player.sid) for player in players if not player.name.startswith('BOT')]
-    
-
+            if player.sid == request.sid:
+                result = player.throw_card_using_code(card)
+                if result == None:
+                    pass
+                else:
+                    server.socketio.emit("throwed_card", {'username' : player.name, 'card_code' : card}, to=id)
 
 @server.socketio.on('send message')
 def send_room_message(data):

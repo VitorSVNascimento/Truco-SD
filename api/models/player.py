@@ -20,9 +20,13 @@ class Player:
         :param card_code: Uma string representando o código da carta a ser removida da mão do jogador.
         :return: Um objeto da classe 'Card' que foi removido da mão do jogador, ou None se a carta não for encontrada.
         """
-        for card in self.cards:
-            if card.code == card_code:
-                return self.cards.pop(self.cards.index(card))
+        print("chegou no card")
+        print(self.cards)
+        for card in self.cards['cards']:
+            print(card)
+            if card['code'] == card_code:
+                self.cards['remaining'] = int(self.cards['remaining']) - 1
+                return self.cards['cards'].pop(self.cards['cards'].index(card))
         return None
     
     def throw_card(self, card: Card) -> Card:

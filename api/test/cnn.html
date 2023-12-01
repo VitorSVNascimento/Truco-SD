@@ -19,11 +19,14 @@
     <button id="createbutton">Create Room</button>
     <button id="joinbutton">Join Room</button>
     <button id="startbutton">Start Room</button>
+    
+    <br>
+    <input type="text" id="id_card" placeholder="Card">
+    <button id="sendCard">sendCard</button>
 
     <ul id="messages"></ul>
     <input type="text" id="myMessage">
     <button id="sendbutton">Send</button>
-
 <script type="text/javascript">
 $(document).ready(function() {
 
@@ -62,6 +65,20 @@ $(document).ready(function() {
         socket.emit('send message', {message: $('#myMessage').val(),room : room});
         $('#myMessage').val('');
     });
+
+    $('#sendCard').on('click', function(){
+        var id_card = $('#id_card').val();
+        socket.emit('throw_card', {card_code : id_card});
+    });
+
+    socket.on('throwed_card',function(msg){
+        $("#messages").append('<li>'+msg+'</li>');
+        console.log(msg);
+    })
+
+    socket.on('connect_successfully', function(data){
+        console.log(data)
+    })
 
 });
 </script>

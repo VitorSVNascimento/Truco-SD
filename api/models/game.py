@@ -20,6 +20,7 @@ class Game:
         self.add_player(self.owner, TEAM_ONE)
 
     def start(self):
+        
         # Preenchendo com BOTs
         self.__fill_with_bots()
 
@@ -50,8 +51,13 @@ class Game:
         :param team_id: (opcional) Um número inteiro representando o ID da equipe à qual o jogador deve ser adicionado.
         :return: A equipe à qual o jogador foi adicionado, ou None se não houver espaço em nenhuma equipe disponível.
         """
+        for team in self.teams:
+            for playerName in team.players:
+                if playerName.name == player.name:
+                    player.name = player.name + str(len(self.teams[0].players) + len(self.teams[1].players))
+
         if self.started:
-            return None
+            return player.name
 
         if team_id:
             team = next((tm for tm in self.teams if tm.id == team_id), None)
