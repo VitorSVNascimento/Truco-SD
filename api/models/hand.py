@@ -19,7 +19,7 @@ class Hand:
     def start_hand(self):
         pass
 
-    def throw_card(self,player:Player,card:Card,team:Team)
+    def throw_card(self,player:Player,card:Card,team:Team):
         pass
     def __next_round(self):
         pass
