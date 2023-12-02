@@ -12,6 +12,7 @@ channels:
       message:
         oneOf:
         - $ref: '#/components/messages/connect_successfully'
+        - $ref: '#/components/messages/round_order'
         - $ref: '#/components/messages/your_cards'
         - $ref: '#/components/messages/throwed_card'
     x-handlers:
@@ -44,6 +45,13 @@ components:
       name: connect_successfully
       payload:
         $ref: '#/components/schemas/ConnectSuccessfully'
+        deprecated: false
+    round_order:
+      description: "Ordem dos jogadores de um round em uma m\xE3o (Cada m\xE3o possui\
+        \ 3 rounds)"
+      name: round_order
+      payload:
+        $ref: '#/components/schemas/PlayerOrder'
         deprecated: false
     throwed_card:
       description: "Representa\xE7\xE3o de uma carta jogada na mesa pelo jogador"
@@ -118,6 +126,33 @@ components:
     NoSpec:
       deprecated: false
       description: Specification is not provided
+    PlayerOrder:
+      definitions:
+        RoundPlayer:
+          description: "Nome de usu\xE1rio do jogador na ordem de jogadores em um\
+            \ round"
+          properties:
+            username:
+              description: "Nome do usu\xE1rio que acabou de se conectou ao jogo"
+              title: "Nome do usu\xE1rio"
+              type: string
+          required:
+          - username
+          title: RoundPlayer
+          type: object
+      description: "Ordem de jogadores em um round (Cada m\xE3o possui 3 rounds)"
+      properties:
+        player_order:
+          description: "Lista de usernames dos jogadores de um round em um m\xE3o\
+            \ (Cada m\xE3o possui 3 rounds)"
+          items:
+            $ref: '#/components/schemas/PlayerOrder/definitions/RoundPlayer'
+          title: Ordem dos jogadores
+          type: array
+      required:
+      - player_order
+      title: PlayerOrder
+      type: object
     ThrowCard:
       description: 'ThrowCard Class
 

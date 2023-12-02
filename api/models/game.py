@@ -143,7 +143,10 @@ class Game:
                 if Requests.is_response_sucessful(response):
                     player.cards = [Card(card_code) for card_code in drawn_cards_code]
 
-
+    def player_order_to_json(self):
+        return {
+            'player_order' : [player.name for player in self.player_order]
+        }
 
     def to_json(self):
         return {

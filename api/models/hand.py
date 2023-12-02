@@ -12,7 +12,7 @@ class Hand:
         self.next_player = first_player
         self.round = 0
         self.hand_value = BASE_HAND_VALUE
-        self.table_cards = []
+        self.table_cards = [[1,2,3,4],[1,2,3,4],[1,2,3,4]]
 
     def start_hand(self):
         pass
