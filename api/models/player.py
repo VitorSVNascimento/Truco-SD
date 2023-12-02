@@ -50,7 +50,7 @@ class Player:
             'cards': self.cards_to_json()
         }
 
-    def cards_to_json(self):
+    def cards_to_json(self) -> dict:
         return {
             'cards': [card.to_json() for card in self.cards]
         }    

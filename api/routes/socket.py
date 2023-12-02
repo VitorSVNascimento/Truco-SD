@@ -98,7 +98,7 @@ def start():
     if request.sid == game_list.games[id - 1].owner.sid:
         game_list.games[id - 1].start()
         print(game_list.games[id - 1].to_json())
-        [server.socketio.emit('your_cards',{'cards':player.cards_to_json()},to=player.sid) for player in game_list.games[id - 1].player_order if not player.name.startswith('BOT')]
+        [server.socketio.emit('your_cards',player.cards_to_json(),to=player.sid) for player in game_list.games[id - 1].player_order if not player.name.startswith('BOT')]
 
         
     server.socketio.emit(
