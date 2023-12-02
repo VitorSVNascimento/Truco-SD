@@ -24,14 +24,9 @@ export default function Home() {
 		} else {
 			socket.connect()
 
-			socket.on("connect_succesfully", (data: any) => {
-				console.log({ data })
-			})
-
 			socket.on("connect", () => {
-				console.log("Connected handle", socket)
-
-				if (!firstConnect) setFirstConnect(true) // set first connect to true so that the user is redirected to chat upon first connection
+				console.log("socket connected", socket)
+				if (!firstConnect) setFirstConnect(true) // set first connect to true so that the user is redirected to wait room upon first connection
 			})
 		}
 	}
@@ -54,14 +49,9 @@ export default function Home() {
 		} else {
 			socket.connect()
 
-			socket.on("connect_succesfully", (data: any) => {
-				console.log({ data })
-			})
-
 			socket.on("connect", () => {
-				console.log("Connected handle", socket)
-
-				if (!firstConnect) setFirstConnect(true) // set first connect to true so that the user is redirected to chat upon first connection
+				console.log("socket connected", socket)
+				if (!firstConnect) setFirstConnect(true) // set first connect to true so that the user is redirected to wait room upon first connection
 			})
 		}
 	}
@@ -101,8 +91,7 @@ export default function Home() {
 			username,
 			room,
 		})
-		socket.emit("connect_game", { username, room })
-		navigate("/waitRoom")
+		socket.emit("connect_game", { username, room, team: 3 })
 	}
 
 	useEffect(() => {
@@ -135,22 +124,42 @@ export default function Home() {
 	}, [firstConnect])
 
 	useEffect(() => {
-		const handleGameCreated = (data: any) => {
-			console.log("game_created", data)
-			setRoom(data.room)
-			setUser({
-				id: socket.id,
-				username,
-				room: data.room,
-			})
-			navigate("/waitRoom")
-		}
+		socket.on("connect_successfully", (data: any) => {
+			console.log("connect_successfully", data)
+			const isLeader = !room
+			if (isLeader) {
+				setRoom(data.room)
+				setUser({
+					id: socket.id,
+					username,
+					room: data.room,
+				})
+			}
 
-		socket.on("game_created", handleGameCreated)
+			const players = data["players"]
+
+			const team1 = players.at(0)
+			while (team1.length < 2) {
+				team1.push("")
+			}
+			const team2 = players.at(1)
+			while (team2.length < 2) {
+				team2.push("")
+			}
+
+			navigate("/waitRoom", {
+				state: {
+					props: {
+						playersNames: [...team1, ...team2],
+						isLeader,
+					},
+				},
+			})
+		})
 
 		// Cleanup function to remove the event listener when the component unmounts
 		return () => {
-			socket.off("game_created", handleGameCreated)
+			socket.off("connect_successfully")
 		}
 	}, [username, user]) // Add socket and username as dependencies
 
@@ -159,7 +168,7 @@ export default function Home() {
 			<div className="grid min-h-screen content-center gap-5 bg-gradient-to-bl from-blue-700 via-blue-800 to-slate-700 md:grid-cols-2 md:content-normal md:bg-white/90">
 				<div className="flex h-full w-full flex-col items-center gap-3 p-4 text-white/90 md:justify-center md:bg-slate-500">
 					<img src="/cards.svg" alt="Cartas" className="-my-8 h-32 w-32 invert" />
-					<h1 className="text-6xl font-semibold">Truco</h1>
+					<h1 className="text-3xl font-semibold md:text-5xl">Truco</h1>
 					<div className="text-center text-lg text-white/75">
 						Crie uma sala ou conecte-se a uma já existente para jogar
 					</div>
@@ -208,7 +217,7 @@ export default function Home() {
 						</button>
 						<button
 							type="submit"
-							className="rounded-md bg-green-500 px-8 py-2.5 text-sm font-semibold text-gray-100 shadow-sm hover:bg-green-600 focus:outline focus:outline-green-300"
+							className="rounded-md bg-red-500 px-8 py-2.5 text-sm font-semibold text-gray-100 shadow-sm hover:bg-red-600 focus:outline focus:outline-red-300"
 							onClick={handleBackButton}
 						>
 							Voltar
@@ -263,7 +272,7 @@ export default function Home() {
 						</button>
 						<button
 							type="submit"
-							className="rounded-md bg-green-500 px-8 py-2.5 text-sm font-semibold text-gray-100 shadow-sm hover:bg-green-600 focus:outline focus:outline-green-300"
+							className="rounded-md bg-transparent px-8 py-2.5 text-sm font-semibold text-gray-100 shadow-sm ring-2 ring-green-500 hover:bg-green-500 focus:outline focus:outline-green-300"
 							onClick={handleConnect}
 						>
 							Conectar

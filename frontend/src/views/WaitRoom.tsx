@@ -1,5 +1,5 @@
 import { useEffect, useContext, useState } from "react"
-import { useNavigate } from "react-router-dom"
+import { useNavigate, useLocation } from "react-router-dom"
 import { UserContext } from "../contexts/UserContext"
 import SocketContext from "../contexts/SocketContext"
 import Icon from "@mui/material/Icon"
@@ -9,7 +9,10 @@ export default function waitRoom() {
 	const socket = useContext(SocketContext)
 	const { user } = useContext(UserContext)
 	const navigate = useNavigate()
-	const [playersNames, setPlayersNames] = useState<string[]>(["test"])
+	const location = useLocation()
+	const { props } = location.state
+	const [playersNames, setPlayersNames] = useState<string[]>(props.playersNames)
+	const isLeader = props.isLeader
 
 	useEffect(() => {
 		console.log("user waitRoom", user)
@@ -41,18 +44,27 @@ export default function waitRoom() {
 
 	return (
 		<>
-			<div className="flex min-h-screen flex-col items-center gap-3 bg-slate-400 p-3 text-slate-100">
+			<div className="flex min-h-screen flex-col items-center gap-10 bg-slate-400 p-10 text-slate-100 md:gap-28">
 				<div className="text-center">
-					<h1>Sala de Espera</h1>
-					<Icon className="me-auto">hourglass_empty</Icon>
+					<Icon className="animate-spin duration-100" fontSize="large">
+						hourglass_empty
+					</Icon>
+					<h1 className="text-3xl">Sala de Espera</h1>
 				</div>
-				<div className="flex grow content-center items-center">
-					{playersNames?.map((playerName: any) => (
-						<WaitRoomPlayer key={playerName} playerName={playerName} />
+				<div className="grid w-full max-w-3xl grow grid-cols-2 gap-5">
+					{playersNames?.map((playerName: any, index: number) => (
+						<WaitRoomPlayer key={index} playerName={playerName} />
 					))}
 				</div>
 				<div>
-					<button className="rounded-md bg-green-500 p-2 hover:bg-green-700">Começar Jogo</button>
+					<button
+						className={`
+							just rounded-md bg-green-500 p-2 shadow-sm hover:bg-green-700
+							${!isLeader && "invisible"}
+						`}
+					>
+						Começar Jogo
+					</button>
 				</div>
 			</div>
 		</>
