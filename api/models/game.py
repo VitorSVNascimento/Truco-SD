@@ -3,21 +3,43 @@ from models.bot import Bot
 from models.team import Team
 from models.card import Card
 from .player import Player
+from .hand import Hand
 
 TEAM_ONE = 1
 TEAM_TWO = 2
 CARDS_PER_PLAYER = 3
 PLAYERS_AMOUNT = 4
+FIRST_PLAYER = 0
+
+SUCCESS = 200
+NOT_IN_THIS_GAME = 400
+ITS_NOT_YOUR_TURN = 401
+'''
+Códigos das mensagens de erro
+'''
+
+
+messages = {
+    SUCCESS:'Sucesso',
+    NOT_IN_THIS_GAME:'Você não está nesta partida',
+    ITS_NOT_YOUR_TURN:'Não é sua vez de jogar'
+}
+'''
+JSON de mensagens de erro
+'''
+
+
 
 class Game:
     def __init__(self, id: int, owner: Player):
         self.id = id
         self.owner = owner
-        self.teams = [Team(TEAM_ONE, []), Team(TEAM_TWO, [])]
+        self.teams:list[Team] = [Team(TEAM_ONE, []), Team(TEAM_TWO, [])]
         self.started = False
         self.player_order: list[Player] = []
         self.next_player = 0
         self.deck = None
+        self.current_hand:Hand = None
         self.add_player(self.owner, TEAM_ONE)
 
     def start(self):
@@ -30,6 +52,8 @@ class Game:
 
         # Printando a ordem dos jogadores.
         [print(player.name) for player in self.player_order]
+
+        self.current_hand = Hand(1,self.player_order[FIRST_PLAYER])
 
         # Criando o baralho de truco e armazenando em deck caso o request ocorreu com sucesso.
         response = Requests.create_truco_deck()
@@ -91,6 +115,19 @@ class Game:
                 if i < len(team.players):
                     self.player_order.append(team.players[i])
 
+    def __define_player_order_by_last_winner(self,username:str) -> None:
+        """
+        Define a ordem dos jogadores com base no jogador que ganhou a ultima mão:
+        return: None
+        """
+        self.__define_player_order()
+
+        team = self.find_player_team(username)
+        player = team.get_player_by_username(username)
+        position_winner = self.player_order.index(player)
+
+        self.player_order[:] = self.player_order[position_winner:] + self.player_order[:position_winner]
+
     def __fill_with_bots(self) -> None:
         """
         Preenche as equipes com bots até que todas as equipes estejam cheias.
@@ -142,6 +179,28 @@ class Game:
                 # Criando as cartas de cada jogador
                 if Requests.is_response_sucessful(response):
                     player.cards = [Card(card_code) for card_code in drawn_cards_code]
+
+    def throw_card(self,card:Card,username:str):
+        if username != self.player_order[FIRST_PLAYER].name:
+            return ITS_NOT_YOUR_TURN
+        player_current = self.player_order[FIRST_PLAYER]
+        
+        self.current_hand.throw_card(player_current,card,self.find_player_team(player_current))
+        self.player_order.pop()
+        winner = self.current_hand.get_winner()
+        if not self.player_order or winner != 0:
+            if self.current_hand.round == 3:
+                pass
+            else:
+                self.current_hand.__next_round()
+            self.__define_player_order()
+
+    def find_player_team(self, player:Player) -> Team:
+        for team in self.teams:
+            if team.contains_player(player.name):
+                return team
+        return None
+        
 
     def player_order_to_json(self):
         return {

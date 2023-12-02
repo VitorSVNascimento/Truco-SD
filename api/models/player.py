@@ -19,11 +19,8 @@ class Player:
         :param card_code: Uma string representando o código da carta a ser removida da mão do jogador.
         :return: Um objeto da classe 'Card' que foi removido da mão do jogador, ou None se a carta não for encontrada.
         """
-        print("chegou no card")
         for index, card in enumerate(self.cards):
-            print(card.to_json())
             if card.code == card_code.upper():
-                print('Não retornou None')
                 return self.cards.pop(index)
         return None
     

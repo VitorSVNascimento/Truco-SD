@@ -92,7 +92,6 @@ def start():
 def throw(data):
     id = game_list.sids[request.sid]
     card_code = data['card_code']
-    print(f'Codígo da carta = {card_code}')
     for player in game_list.games[id - 1].player_order:
         if player.sid == request.sid:
             result = player.throw_card_using_code(card_code)

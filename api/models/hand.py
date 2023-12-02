@@ -1,4 +1,6 @@
 from models.player import Player
+from models.card import Card
+from models.team import Team
 
 ''' Valor base (tentos) de uma mão '''
 BASE_HAND_VALUE = 2
@@ -17,6 +19,8 @@ class Hand:
     def start_hand(self):
         pass
 
+    def throw_card(self,player:Player,card:Card,team:Team)
+        pass
     def __next_round(self):
         pass
     
