@@ -1,3 +1,4 @@
+from constants.server_constants import DECK_OF_CARDS_API_PORT,DECK_OF_CARDS_API_HOST
 CARDS_WEIGHT = {
     '4C': 14, '7H': 13, 'AS': 12, '7D': 11, # Special cards
 
@@ -97,6 +98,7 @@ class Card:
             'code': self.code,
             'weight': self.weight,
             'value' : self.value,
-            'suit' : self.suit
+            'suit' : self.suit,
+            'url_image' : f'http://{DECK_OF_CARDS_API_HOST}:{DECK_OF_CARDS_API_PORT}/static/img/{self.code}.png'
         }    
         

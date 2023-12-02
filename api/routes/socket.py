@@ -4,6 +4,7 @@ from server.instance import server
 from models.game_list import game_list
 from models.game import Game, TEAM_ONE, TEAM_TWO
 from models.player import Player
+from models.card import Card
 
 messageCount = 0
 players = []
@@ -32,7 +33,7 @@ def create(data):
     server.socketio.emit(
         'room_message', {'username' : username, 'message' : f'{username} has created and intered on room {id} on team 1'}, to=id)
     server.socketio.emit(
-        'connect_successfully', {'players':team_userNames,'room':id}, to=id)
+        'connect_successfully', {'username':username, 'players':team_userNames,'room':id}, to=id)
 
 # @server.socketio.on('connect_game')
 # def create(data):
@@ -74,8 +75,7 @@ def join(data):
                     team_userNames.append(team_list)
                 # Entrou no time
                 server.socketio.emit(
-
-                    'connect_successfully', {'players':team_userNames,'room':id}, to=id)
+                    'connect_successfully', {'username':playName, 'players':team_userNames,'room':id}, to=id)
                 server.socketio.emit(
                     'room_message', f'{playName} has created and intered on room {id} ', to=id)
                 
@@ -113,7 +113,8 @@ def throw(data):
         if player.sid == request.sid:
             result = player.throw_card_using_code(card_code)
             if result is not None:
-                server.socketio.emit("throwed_card", {'username' : player.name, 'card_code' : card_code}, to=id)
+                card = Card(card_code)
+                server.socketio.emit("throwed_card", {'username' : player.name, 'card' : card.to_json()}, to=id)
 
 @server.socketio.on('send message')
 def send_room_message(data):

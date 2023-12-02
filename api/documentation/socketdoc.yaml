@@ -6,11 +6,14 @@ channels:
         oneOf:
         - $ref: '#/components/messages/Create_Game'
         - $ref: '#/components/messages/Connect_Game'
+        - $ref: '#/components/messages/Start_Game'
+        - $ref: '#/components/messages/Throw_Card'
     subscribe:
       message:
         oneOf:
-        - $ref: '#/components/messages/game_created'
         - $ref: '#/components/messages/connect_successfully'
+        - $ref: '#/components/messages/your_cards'
+        - $ref: '#/components/messages/throwed_card'
     x-handlers:
       disconnect: disconnect
 components:
@@ -27,17 +30,32 @@ components:
       payload:
         $ref: '#/components/schemas/CreateGameData'
         deprecated: false
+    Start_Game:
+      description: ''
+      name: start_game
+    Throw_Card:
+      description: ''
+      name: throw_card
+      payload:
+        $ref: '#/components/schemas/ThrowCard'
+        deprecated: false
     connect_successfully:
       description: Sucesso ao se conectar ao jogo
       name: connect_successfully
       payload:
         $ref: '#/components/schemas/ConnectSuccessfully'
         deprecated: false
-    game_created:
-      description: Sucesso ao criar o jogo
-      name: game_created
+    throwed_card:
+      description: "Representa\xE7\xE3o de uma carta jogada na mesa pelo jogador"
+      name: throwed_card
       payload:
-        $ref: '#/components/schemas/GameCreatedSuccessfully'
+        $ref: '#/components/schemas/ThrowedCard'
+        deprecated: false
+    your_cards:
+      description: "Lista de cards da m\xE3o do jogador"
+      name: your_cards
+      payload:
+        $ref: '#/components/schemas/YourCards'
         deprecated: false
   schemas:
     ConnectGameData:
@@ -60,29 +78,34 @@ components:
     ConnectSuccessfully:
       description: "Mensagem que representa sucesso na conex\xE3o a um jogo"
       properties:
+        players:
+          description: "Lista de jogadores conectados a partida separado por times\
+            \ posi\xE7\xE3o 0 time 1, posi\xE7\xE3o 1 time 2"
+          items:
+            items:
+              type: string
+            type: array
+          title: Lista de jogadores conectados a sala
+          type: array
         room:
           description: "Id do jogo em que o usu\xE1rio se conectou"
           title: Sala
           type: integer
-        team_id:
-          description: "Id do time em que o usu\xE1rio vai jogar"
-          title: Id do time
-          type: integer
         username:
-          description: "Nome do usu\xE1rio que se conectou ao jogo"
+          description: "Nome do usu\xE1rio que acabou de se conectou ao jogo"
           title: "Nome do usu\xE1rio"
           type: string
       required:
+      - players
       - username
       - room
-      - team_id
       title: ConnectSuccessfully
       type: object
     CreateGameData:
       description: 'Mensagem para criar um novo jogo
 
 
-        return: uma  mensagem de acordo com o modelo GameCreatedSuccessfully'
+        return: uma  mensagem de acordo com o modelo ConnectSuccessfully'
       properties:
         username:
           description: "Nome do usu\xE1rio que deseja criar o novo jogo"
@@ -92,20 +115,121 @@ components:
       - username
       title: CreateGameData
       type: object
-    GameCreatedSuccessfully:
-      description: "Mensagem que representa a cria\xE7\xE3o de um jogo com sucesso."
-      properties:
-        room:
-          description: Id da novo jogo criado
-          title: Sala
-          type: integer
-      required:
-      - room
-      title: GameCreatedSuccessfully
-      type: object
     NoSpec:
       deprecated: false
       description: Specification is not provided
+    ThrowCard:
+      description: 'ThrowCard Class
+
+
+        Codigo da carta a ser jogada'
+      properties:
+        code:
+          description: "C\xF3digo da carta do baralho, nome da carta e naipe EX: 4S,JH"
+          title: Codigo da carta
+          type: string
+      required:
+      - code
+      title: ThrowCard
+      type: object
+    ThrowedCard:
+      definitions:
+        PlayerCard:
+          description: "Representa\xE7\xE3o JSON de uma carta de baralho"
+          properties:
+            code:
+              description: "C\xF3digo da carta do baralho, nome da carta e naipe EX:\
+                \ 4S,JH"
+              title: Codigo da carta
+              type: string
+            suit:
+              description: Nome do naipe da carta
+              title: Naipe da carta
+              type: string
+            url_image:
+              description: Link para a imagem png da carta
+              title: Link para a imagem da carta
+              type: string
+            value:
+              description: Valor da carta independente do naipe
+              title: Valor da carta
+              type: string
+            weight:
+              description: "peso da carta na API a carta com o peso maior vence a\
+                \ m\xE3o"
+              title: Peso da carta
+              type: integer
+          required:
+          - code
+          - weight
+          - value
+          - suit
+          - url_image
+          title: PlayerCard
+          type: object
+      description: "Representa\xE7\xE3o de uma carta jogada na mesa pelo jogador"
+      properties:
+        card:
+          allOf:
+          - $ref: '#/components/schemas/ThrowedCard/definitions/PlayerCard'
+          description: "Informa\xE7\xF5es da carta jogada pelo jogador"
+          title: Carta do jogador
+        username:
+          description: "Nome do usu\xE1rio que acabou de se conectou ao jogo"
+          title: "Nome do usu\xE1rio"
+          type: string
+      required:
+      - card
+      - username
+      title: ThrowedCard
+      type: object
+    YourCards:
+      definitions:
+        PlayerCard:
+          description: "Representa\xE7\xE3o JSON de uma carta de baralho"
+          properties:
+            code:
+              description: "C\xF3digo da carta do baralho, nome da carta e naipe EX:\
+                \ 4S,JH"
+              title: Codigo da carta
+              type: string
+            suit:
+              description: Nome do naipe da carta
+              title: Naipe da carta
+              type: string
+            url_image:
+              description: Link para a imagem png da carta
+              title: Link para a imagem da carta
+              type: string
+            value:
+              description: Valor da carta independente do naipe
+              title: Valor da carta
+              type: string
+            weight:
+              description: "peso da carta na API a carta com o peso maior vence a\
+                \ m\xE3o"
+              title: Peso da carta
+              type: integer
+          required:
+          - code
+          - weight
+          - value
+          - suit
+          - url_image
+          title: PlayerCard
+          type: object
+      description: "Cartas atuais da m\xE3o do jogador"
+      properties:
+        cards:
+          description: "Lista de cards da m\xE3o do jogador"
+          items:
+            $ref: '#/components/schemas/YourCards/definitions/PlayerCard'
+          title: Lista de cards
+          type: array
+      required:
+      - cards
+      title: YourCards
+      type: object
 info:
   description: 'API para gerenciar partidas de truco
 

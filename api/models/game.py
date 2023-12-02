@@ -58,7 +58,7 @@ class Game:
                     player.name = player.name + str(len(self.teams[0].players) + len(self.teams[1].players))
 
         if self.started:
-            return player.name
+            return None
 
         if team_id:
             team = next((tm for tm in self.teams if tm.id == team_id), None)
@@ -67,7 +67,7 @@ class Game:
 
         if team:
             if team.add_player(player):
-                return team
+                return player.name
             
         return None
     
