@@ -26,7 +26,7 @@ class Team:
             raise Team.MaximumNumberOfPlayersException()
         
         self.players = players
-        self.hand_score = 0
+        # self.hand_score = 0
         self.games_won = 0
 
     def add_player(self, player: Player) -> bool:
@@ -89,6 +89,6 @@ class Team:
         return {
             'id': self.id,
             'players': [player.to_json() for player in self.players],
-            'hand_score': self.hand_score,
+            # 'hand_score': self.hand_score,
             'games_won': self.games_won
         } 
