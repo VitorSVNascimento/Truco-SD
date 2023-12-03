@@ -83,6 +83,12 @@ $(document).ready(function() {
     socket.on('round_order', function(data){
         console.log(data)
     })
+    socket.on('end_hand', function(data){
+        console.log(data)
+    })
+    socket.on('end_round', function(data){
+        console.log(data)
+    })
 
 
 });

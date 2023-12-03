@@ -2,8 +2,10 @@ from flask import request
 from flask_socketio import  join_room, emit
 from server.instance import server
 from models.game_list import game_list
-from models.game import Game, TEAM_ONE, TEAM_TWO
+from models.game import Game, TEAM_ONE, TEAM_TWO,messages_json,SUCCESS,END_HAND,END_ROUND
+from models.hand import DRAW
 from models.player import Player
+from models.hand_resullt import HandResult
 from models.card import Card
 
 messageCount = 0
@@ -98,10 +100,24 @@ def throw(data):
     card_code = data['card_code']
     for player in game_list.games[id - 1].player_order:
         if player.sid == request.sid:
-            result = game_list.games[id -1].throw_card()
-            if result is not None:
-                card = Card(card_code)
-                server.socketio.emit("throwed_card", {'username' : player.name, 'card' : card.to_json()}, to=id)
+            
+            card = Card(card_code)
+            result = game_list.games[id -1].throw_card(card,player.name)
+            if isinstance(result,HandResult):
+                server.socketio.emit('throwed_card',{'username' : player.name,'card':card.to_json()},to=id)
+                server.socketio.emit('end_hand',{'new_order':game_list.games[id -1].player_order_to_json()['player_order'],
+                                                 'score':game_list.games[id -1].get_score(),'winner':result.team_winner.id},to=id)
+                [server.socketio.emit('your_cards',player.cards_to_json(),to=player.sid) for player in game_list.games[id - 1].player_order if not player.name.startswith('BOT')]
+                return
+            if isinstance(result,Player) or result == DRAW: 
+                server.socketio.emit('throwed_card', {'username' : player.name, 'card' : card.to_json()}, to=id)
+                server.socketio.emit('end_round',{'team':game_list.games[id -1].find_player_team(result).id if result != DRAW else DRAW,
+                                                  'new_order':game_list.games[id -1].player_order_to_json()['player_order']},to=id)
+                [server.socketio.emit('your_cards',player.cards_to_json(),to=player.sid) for player in game_list.games[id - 1].player_order if not player.name.startswith('BOT')]
+                return
+
+            server.socketio.emit('throwed_card', {'username' : player.name, 'card' : card.to_json()}, to=id)
+            
 
 @server.socketio.on('send message')
 def send_room_message(data):

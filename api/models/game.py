@@ -4,8 +4,7 @@ from models.team import Team
 from models.card import Card
 from .player import Player
 from .hand_resullt import HandResult
-from .hand_resullt import HandResult
-from .hand import Hand
+from .hand import Hand,DRAW
 
 TEAM_ONE = 1
 TEAM_TWO = 2
@@ -24,7 +23,7 @@ Códigos das mensagens de erro
 LAST_ROUND = 3
 
 
-messages = {
+messages_json = {
     SUCCESS : 'Sucesso',
     NOT_IN_THIS_GAME : 'Você não está nesta partida',
     ITS_NOT_YOUR_TURN : 'Não é sua vez de jogar',
@@ -129,8 +128,7 @@ class Game:
         """
         self.__define_player_order()
 
-        team = self.find_player_team(username)
-        player = team.get_player_by_username(username)
+        player = self.get_player_by_username(username)
         position_winner = self.player_order.index(player)
 
         self.player_order[:] = self.player_order[position_winner:] + self.player_order[:position_winner]
@@ -197,26 +195,32 @@ class Game:
         player_current.throw_card(card)
         self.current_hand.throw_card(player_current,card,self.find_player_team(player_current))
 
-        self.player_order.pop(00)
+        self.player_order.pop(0)
 
-        winner = self.current_hand.get_round_winner()
+        winner = self.current_hand.get_current_round_winner()
         if winner != None:
             #Alguém venceu o round
             hand_result : HandResult = self.current_hand.get_winner()
-            
+            print('------------hand result----------')
+            print(hand_result.to_json())
             if hand_result.team_winner != None:
                 #Alguém venceu a mão
                 self.teams[self.teams.index(hand_result.team_winner)].increment_score(hand_result.hand_value)
                 self.__define_player_order_by_last_winner(hand_result.next_player.name)
                 [player.cards.clear() for player in self.player_order]
                 self.__create_players_piles(self.deck['deck_id'], self.player_order)
-                return messages[END_HAND]
+                return hand_result
             
+
             self.__define_player_order_by_last_winner(winner.name)
-            [player.cards.clear() for player in self.player_order]
-            self.__create_players_piles(self.deck['deck_id'], self.player_order)
-            return messages[END_ROUND]
-        return messages[SUCCESS]
+            print('----------------New Round------------------')
+            [print(f'{player.name} = {[card.code for card in player.cards]}') for player in self.player_order]
+            team_winner = self.current_hand.get_current_round_winner()
+            self.current_hand.next_round()
+            if team_winner == DRAW:
+                return team_winner
+            return winner
+        return messages_json[SUCCESS]
 
     def find_player_team(self, player:Player) -> Team:
         for team in self.teams:
@@ -236,3 +240,13 @@ class Game:
             'owner':self.owner.to_json(),
             'teams':[team.to_json() for team in self.teams]
         }
+    
+    def get_player_by_username(self,username:str):
+        for team in self.teams:
+            for player in team.players:
+                if player.name == username:
+                    return player
+        return None
+    
+    def get_score(self,):
+        return [self.teams[TEAM_ONE -1].score,self.teams[TEAM_TWO -1].score]
