@@ -12,12 +12,12 @@ export default function waitRoom() {
 	const { user } = useContext(UserContext)
 	const navigate = useNavigate()
 	const location = useLocation()
-	const { props } = location.state
-	const [playersNames, setPlayersNames] = useState<string[]>(props.playersNames)
-	const isLeader = props.isLeader
+	const { props } = location.state || {}
+	const [playersNames, setPlayersNames] = useState<string[]>(props?.playersNames)
+	const isLeader = props?.isLeader
 	const [status, setStatus] = useState("")
 	const { setEventData } = useContext(EventContext)
-	const room = props.room
+	const room = props?.room
 
 	const emitEvent = (data: EventData) => {
 		setEventData(data)
@@ -51,8 +51,16 @@ export default function waitRoom() {
 		socket.on("connect_successfully", (data: any) => {
 			console.log("connect_successfully", playersNames)
 			const players = data["players"]
+
 			const team1 = players.at(0)
+			while (team1.length < 2) {
+				team1.push("")
+			}
 			const team2 = players.at(1)
+			while (team2.length < 2) {
+				team2.push("")
+			}
+
 			setPlayersNames([...team1, ...team2])
 		})
 
