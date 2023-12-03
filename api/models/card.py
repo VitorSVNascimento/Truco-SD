@@ -57,7 +57,7 @@ class Card:
         Retorna a URL de uma imagem da carta com base em seu código.
         :return: Uma string contendo a URL da imagem da carta no formato 'https://deckofcardsapi.com/static/img/{code}.png'.
         """
-        return f"https://{DECK_OF_CARDS_API_HOST}:{DECK_OF_CARDS_API_PORT}/static/img/{self.code}.svg"
+        return f"http://{DECK_OF_CARDS_API_HOST}:{DECK_OF_CARDS_API_PORT}/static/img/{self.code}.svg"
     
     def __le__(self, other_card: 'Card') -> bool:
         if isinstance(other_card, Card):
