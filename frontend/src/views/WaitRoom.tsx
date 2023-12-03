@@ -50,6 +50,9 @@ export default function waitRoom() {
 						hourglass_empty
 					</Icon>
 					<h1 className="text-3xl">Sala de Espera</h1>
+					<h3 className={`
+							${!isLeader && "invisible"}
+						`}>ID da sala: {user && user["room"]}</h3>
 				</div>
 				<div className="grid w-full max-w-3xl grow grid-cols-2 gap-5">
 					{playersNames?.map((playerName: any, index: number) => (
