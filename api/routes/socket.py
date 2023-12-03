@@ -9,6 +9,10 @@ from models.card import Card
 messageCount = 0
 players = []
 
+RM_SUCCESS = 0
+RM_TEAM_IS_FULL = 1
+RM_ROOM_IS_FULL = 2
+RM_ROOM_NOT_EXIST = 3
 
 @server.socketio.on('connect')
 def test_connect():
@@ -62,20 +66,20 @@ def join(data):
                 server.socketio.emit(
                     'connect_successfully', {'username':playName, 'players':team_userNames,'room':id}, to=id)
                 server.socketio.emit(
-                    'room_message', f'{playName} has created and intered on room {id} ', to=id)
+                    'room_message', {status: RM_SUCCESS, message: f'{playName} has created and intered on room {id} '}, to=id)
                 
             else:
                 # Time cheio
                 server.socketio.emit(
-                    'room_message', f'Team {team_id} on room {id} is full', to=request.sid)
+                    'room_message', {status: RM_TEAM_IS_FULL, message: f'Team {team_id} on room {id} is full'}, to=request.sid)
         else:
             # Sala cheia
             server.socketio.emit(
-                'room_message', f'Room {id} is full.', to=request.sid)
+                'room_message', {status: RM_ROOM_IS_FULL, message: f'Room {id} is full.'}, to=request.sid)
     else:
         # Sala inexistente
         server.socketio.emit(
-            'room_message', f'Room {id} does not exist.', to=request.sid)
+            'room_message', {status: RM_ROOM_NOT_EXIST, message: f'Room {id} does not exist.'}, to=request.sid)
 
 @server.socketio.on('start_game')
 def start():
