@@ -35,7 +35,7 @@ class Hand:
     def get_winner(self,):
         '''
         Verifica o resultado dessa mão
-        Retorna o time vencedor, o valor da mão e o jogador que deve iniciar a próxima mão
+        Retorna um objeto handResult
         '''
         if len(self.hand_winners) <= 1:
             return HandResult(None,NOT_END,None)
@@ -78,36 +78,27 @@ class Hand:
 
     def get_current_round_winner(self):
         if len(self.table_cards[self.round]) < TOTAL_PLAYERS:
-            return None,NOT_END
+            return None
         
         winner_positions = self.__get_max_weight_positions()
 
         if len(winner_positions) == 1:
             self.hand_winners.append(self.table_cards[self.round][winner_positions[0]]['team'])
-            return  self.table_cards[self.round][winner_positions[0]]['player'],self.table_cards[self.round][winner_positions[0]]['team']
+            return  self.table_cards[self.round][winner_positions[0]]['player']
         
         if len(winner_positions) > 2:
             self.hand_winners.append(DRAW)
-            return self.table_cards[self.round][winner_positions[-1]]['player'],DRAW
+            return self.table_cards[self.round][winner_positions[-1]]['player']
         
         if len(winner_positions) == 2:
             if self.table_cards[self.round][winner_positions[0]]['team'] == self.table_cards[self.round][winner_positions[1]]['team']:
                 self.hand_winners.append(self.table_cards[self.round][winner_positions[1]]['team'])
-                return self.table_cards[self.round][winner_positions[1]]['player'],self.table_cards[self.round][winner_positions[1]]['team']
             else:
                 self.hand_winners.append(DRAW)   
-                return self.table_cards[self.round][winner_positions[1]]['team'],DRAW
+            return self.table_cards[self.round][winner_positions[1]]['player']
 
-
-    def __calc_round_winner(self,round_list:list):
-        team_one = 0
-        team_two = 0
-        draw  = 0
-        
-
-
-    def __next_round(self):
-        pass
+    def next_round(self):
+        self.round+=1
     
     def __clear_table(self):
         self.table_cards.clear()

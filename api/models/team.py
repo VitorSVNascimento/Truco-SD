@@ -25,7 +25,7 @@ class Team:
             raise Team.MaximumNumberOfPlayersException()
         
         self.players = players
-        # self.hand_score = 0
+        self.score = 0
         self.games_won = 0
 
     def add_player(self, player: Player) -> bool:
@@ -54,14 +54,14 @@ class Team:
         """
         return len(self.players) >= MAX_PLAYERS
 
-    def increment_hand_score(self, hand_value: int):
+    def increment_score(self, hand_value: int):
         """
         Incrementa a pontuação da mão do time com um valor.
         :param hand_value: Um valor inteiro a ser adicionado à pontuação da mão do time.
         """
         from models.hand import BASE_HAND_VALUE
         if hand_value >= BASE_HAND_VALUE:
-            self.hand_score += hand_value
+            self.score += hand_value
 
     def increment_games_won(self):
         """
@@ -69,11 +69,11 @@ class Team:
         """
         self.games_won += 1
 
-    def reset_hand_score(self):
+    def reset_score(self):
         """
         Reseta a pontuação da mão do time para zero.
         """
-        self.hand_score = 0
+        self.score = 0
 
     def reset_games_won(self):
         """
@@ -89,7 +89,7 @@ class Team:
         return {
             'id': self.id,
             'players': [player.to_json() for player in self.players],
-            # 'hand_score': self.hand_score,
+            'score': self.score,
             'games_won': self.games_won
         } 
     

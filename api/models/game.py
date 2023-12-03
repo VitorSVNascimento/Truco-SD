@@ -4,6 +4,7 @@ from models.team import Team
 from models.card import Card
 from .player import Player
 from .hand_resullt import HandResult
+from .hand_resullt import HandResult
 from .hand import Hand
 
 TEAM_ONE = 1
@@ -22,12 +23,13 @@ Códigos das mensagens de erro
 '''
 LAST_ROUND = 3
 
+
 messages = {
     SUCCESS : 'Sucesso',
     NOT_IN_THIS_GAME : 'Você não está nesta partida',
     ITS_NOT_YOUR_TURN : 'Não é sua vez de jogar',
     END_HAND : 'A mão foi encerrada',
-    END_ROUND : 'O round foi encerrado'
+    END_ROUND : 'O round foi encerrado',
 }
 '''
 JSON de mensagens de erro
@@ -190,10 +192,12 @@ class Game:
         if username != self.player_order[FIRST_PLAYER].name:
             return ITS_NOT_YOUR_TURN
         
+        
         player_current = self.player_order[FIRST_PLAYER]
         player_current.throw_card(card)
         self.current_hand.throw_card(player_current,card,self.find_player_team(player_current))
-        self.player_order.pop(0)
+
+        self.player_order.pop(00)
 
         winner = self.current_hand.get_round_winner()
         if winner != None:

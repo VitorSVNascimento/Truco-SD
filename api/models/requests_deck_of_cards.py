@@ -24,6 +24,16 @@ class Requests:
     def show_cards_pile(deck_id, pile_name):
         url = f"{URL_DECK_OF_CARDS_API}deck/{deck_id}/pile/{pile_name}/list/"
         return requests.get(url).json()
+    
+    @staticmethod
+    def remove_all_cards_of_pile(deck_id):
+        url = f'{URL_DECK_OF_CARDS_API}deck/{deck_id}/return/'
+        return requests.get(url).json()
+    
+    @staticmethod
+    def reshuffle_deck(deck_id):
+        url = f'{URL_DECK_OF_CARDS_API}deck/{deck_id}/shuffle/'
+        return requests.get(url).json()
 
     @staticmethod
     def is_response_sucessful(request_response) -> bool:
