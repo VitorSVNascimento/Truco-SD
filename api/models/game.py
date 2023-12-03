@@ -187,7 +187,7 @@ class Game:
         
         self.current_hand.throw_card(player_current,card,self.find_player_team(player_current))
         self.player_order.pop()
-        winner = self.current_hand.get_winner()
+        winner = self.current_hand.get_round_winner()
         if not self.player_order or winner != 0:
             if self.current_hand.round == 3:
                 pass
