@@ -2,8 +2,7 @@ import { useState, useEffect } from "react"
 import { Icon } from "@mui/material"
 
 export default function Alert(props: { message: string; variant: string; countdown?: number }) {
-	const message = props.message
-	const [show, setShow] = useState(true)
+	const [show, setShow] = useState(false)
 
 	const open = () => {
 		setShow(true)
@@ -25,11 +24,12 @@ export default function Alert(props: { message: string; variant: string; countdo
 	}, [show])
 
 	useEffect(() => {
-		console.log("message", message)
-		if (message) {
+		if (props.message) {
 			open()
+		} else {
+			close()
 		}
-	}, [message])
+	}, [props.message])
 
 	return (
 		show && (
@@ -45,7 +45,7 @@ export default function Alert(props: { message: string; variant: string; countdo
 						: "border-green-600 bg-green-500"
 				}`}
 			>
-				<div>{message}</div>
+				<div>{props.message}</div>
 				<div className="flex" role="button" onClick={close}>
 					<Icon>close</Icon>
 				</div>

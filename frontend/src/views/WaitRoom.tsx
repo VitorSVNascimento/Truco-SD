@@ -2,8 +2,10 @@ import { useEffect, useContext, useState } from "react"
 import { useNavigate, useLocation } from "react-router-dom"
 import { UserContext } from "../contexts/UserContext"
 import SocketContext from "../contexts/SocketContext"
+import EventContext from "../contexts/EventContext"
 import Icon from "@mui/material/Icon"
 import WaitRoomPlayer from "../components/waitRoom/WaitRoomPlayer"
+import { EventData } from "../types/types"
 
 export default function waitRoom() {
 	const socket = useContext(SocketContext)
@@ -14,6 +16,11 @@ export default function waitRoom() {
 	const [playersNames, setPlayersNames] = useState<string[]>(props.playersNames)
 	const isLeader = props.isLeader
 	const [status, setStatus] = useState("")
+	const { setEventData } = useContext(EventContext)
+
+	const emitEvent = (data: EventData) => {
+		setEventData(data)
+	}
 
 	const handleStartGame = (event: React.FormEvent) => {
 		event.preventDefault()
@@ -98,6 +105,13 @@ export default function waitRoom() {
 								role="button"
 								onClick={() => {
 									navigator.clipboard.writeText(room)
+									emitEvent({
+										event: "alert",
+										data: {
+											message: "Sala copiada para a área de transferência",
+											variant: "info",
+										},
+									})
 								}}
 							>
 								content_copy
