@@ -21,3 +21,8 @@ export interface EventData {
     event: string,
     data: any
 }
+
+export interface RoomMessage {
+    status: number,
+    message: string,
+}

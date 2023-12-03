@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom"
 import { UserContext } from "../contexts/UserContext"
 import SocketContext from "../contexts/SocketContext"
 import Icon from "@mui/material/Icon"
+import { RoomMessage } from "../types/types"
 
 export default function Home() {
 	const { user, setUser } = useContext(UserContext)
@@ -85,7 +86,6 @@ export default function Home() {
 	}
 
 	const connectGame = (room: string) => {
-		if (status) setStatus("")
 		setUser({
 			id: socket.id,
 			username,
@@ -124,6 +124,7 @@ export default function Home() {
 	useEffect(() => {
 		socket.on("connect_successfully", (data: any) => {
 			console.log("connect_successfully", data)
+			if (status) setStatus("")
 			const isLeader = !room
 			if (isLeader) {
 				setRoom(data.room)
@@ -156,9 +157,28 @@ export default function Home() {
 			})
 		})
 
+		socket.on("room_message", (roomMessage: RoomMessage) => {
+			console.log("room_message", roomMessage)
+			switch (roomMessage.status) {
+				case 3: {
+					setRoomStatus("room_not_found")
+					break
+				}
+				case 2: {
+					setRoomStatus("room_full")
+					break
+				}
+				case 0: {
+					// success
+					break
+				}
+			}
+		})
+
 		// Cleanup function to remove the event listener when the component unmounts
 		return () => {
 			socket.off("connect_successfully")
+			socket.off("room_message")
 		}
 	}, [username, user]) // Add socket and username as dependencies
 
@@ -181,6 +201,20 @@ export default function Home() {
 										<div className="flex justify-center gap-2 rounded-md bg-red-300 p-3 text-gray-50">
 											<Icon className="me-auto">error</Icon>
 											<div className="me-auto">Sala inválida</div>
+										</div>
+									)
+								case "room_not_found":
+									return (
+										<div className="flex justify-center gap-2 rounded-md bg-red-300 p-3 text-gray-50">
+											<Icon className="me-auto">error</Icon>
+											<div className="me-auto">Sala Inexistente</div>
+										</div>
+									)
+								case "room_full":
+									return (
+										<div className="flex justify-center gap-2 rounded-md bg-red-300 p-3 text-gray-50">
+											<Icon className="me-auto">error</Icon>
+											<div className="me-auto">Sala Cheia</div>
 										</div>
 									)
 								case "connect_error":
