@@ -152,7 +152,6 @@ export default function Home() {
 					props: {
 						playersNames: [...team1, ...team2],
 						isLeader,
-						room: data.room,
 					},
 				},
 			})

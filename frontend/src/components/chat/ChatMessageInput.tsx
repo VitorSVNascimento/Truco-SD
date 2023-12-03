@@ -12,6 +12,13 @@ export default function ChatMessageInput(props: { onSendMessage: (message: strin
 		}
 	}
 
+	const hideChat = () => {
+		const chat = document.querySelector("#chat")
+		const button = document.querySelector("#toggleChatButton")
+		chat?.classList.toggle("hidden")
+		button?.classList.toggle("hidden")
+	}
+
 	return (
 		<>
 			<form className="flex items-center gap-3 bg-slate-300 p-3" onSubmit={sendMessage}>
@@ -24,11 +31,18 @@ export default function ChatMessageInput(props: { onSendMessage: (message: strin
 					autoFocus
 				/>
 				<button
-					className="flex rounded-full bg-green-400 p-3 text-gray-50 shadow-sm focus-within:outline focus-within:outline-green-700 hover:bg-green-600 disabled:bg-green-300"
+					className="flex rounded-full bg-blue-400 p-3 text-gray-50 shadow-sm focus-within:outline focus-within:bg-blue-700 hover:bg-blue-600 disabled:bg-blue-300"
 					type="submit"
 					disabled={!message}
 				>
 					<Icon>send</Icon>
+				</button>
+				<button
+					className="flex rounded-full md:hidden bg-blue-400 p-3 text-gray-50 shadow-sm focus-within:outline focus-within:bg-blue-700 hover:bg-blue-600 disabled:bg-blue-300"
+					type="button"
+					onClick={hideChat}
+				>
+					<Icon>speaker_notes_off</Icon>
 				</button>
 			</form>
 		</>
