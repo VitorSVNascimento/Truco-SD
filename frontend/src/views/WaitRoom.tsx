@@ -17,6 +17,7 @@ export default function waitRoom() {
 	const isLeader = props.isLeader
 	const [status, setStatus] = useState("")
 	const { setEventData } = useContext(EventContext)
+	const room = props.room
 
 	const emitEvent = (data: EventData) => {
 		setEventData(data)
@@ -40,7 +41,6 @@ export default function waitRoom() {
 		if (status) setStatus("")
 		socket.emit("start_game")
 	}
-	const room = props.room
 
 	useEffect(() => {
 		// console.log("user waitRoom", user)

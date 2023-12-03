@@ -151,6 +151,7 @@ export default function Home() {
 				state: {
 					props: {
 						playersNames: [...team1, ...team2],
+						room: data.room,
 						isLeader,
 					},
 				},
