@@ -3,6 +3,7 @@ import Home from "../views/Home"
 import ErrorPage from "../views/ErrorPage"
 import Chat from "../views/Chat"
 import WaitRoom from "../views/WaitRoom"
+import GameRoom from "../views/GameRoom"
 
 const router = createBrowserRouter([
 	{
@@ -17,6 +18,10 @@ const router = createBrowserRouter([
 	{
 		path: "/waitRoom",
 		element: <WaitRoom />,
+	},
+	{
+		path: "/gameRoom",
+		element: <GameRoom />,
 	},
 ])
 

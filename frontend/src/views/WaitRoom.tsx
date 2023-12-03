@@ -13,6 +13,26 @@ export default function waitRoom() {
 	const { props } = location.state
 	const [playersNames, setPlayersNames] = useState<string[]>(props.playersNames)
 	const isLeader = props.isLeader
+	const [status, setStatus] = useState("")
+
+	const handleStartGame = (event: React.FormEvent) => {
+		event.preventDefault()
+
+		if (socket.connected) {
+			startGame()
+		} else {
+			socket.connect()
+
+			socket.on("connect", () => {
+				console.log("socket connected", socket)
+			})
+		}
+	}
+
+	const startGame = () => {
+		if (status) setStatus("")
+		socket.emit("start_game")
+	}
 
 	useEffect(() => {
 		console.log("user waitRoom", user)
@@ -30,6 +50,15 @@ export default function waitRoom() {
 
 		socket.on("your_cards", (cards: any) => {
 			console.log("your_cards", cards)
+
+			navigate("/gameRoom", {
+				state: {
+					props: {
+						playersNames: [...playersNames],
+						isLeader,
+					},
+				},
+			})
 		})
 
 		socket.on("disconnect", () => {
@@ -52,7 +81,7 @@ export default function waitRoom() {
 					<h1 className="text-3xl">Sala de Espera</h1>
 					<h3 className={`
 							${!isLeader && "invisible"}
-						`}>ID da sala: {user && user["room"]}</h3>
+						`}>Código da sala: {user && user["room"]}</h3>
 				</div>
 				<div className="grid w-full max-w-3xl grow grid-cols-2 gap-5">
 					{playersNames?.map((playerName: any, index: number) => (
@@ -65,6 +94,7 @@ export default function waitRoom() {
 							just rounded-md bg-green-500 p-2 shadow-sm hover:bg-green-700
 							${!isLeader && "invisible"}
 						`}
+						onClick={handleStartGame}
 					>
 						Começar Jogo
 					</button>

@@ -16,7 +16,7 @@ export default function ChatMessageInput(props: { onSendMessage: (message: strin
 		<>
 			<form className="flex items-center gap-3 bg-slate-300 p-3" onSubmit={sendMessage}>
 				<input
-					className="w-full rounded-full px-5 py-3 shadow-sm"
+					className="w-full rounded-full px-5 py-3 shadow-sm text-black"
 					type="text"
 					placeholder="Digite sua mensagem"
 					value={message}
