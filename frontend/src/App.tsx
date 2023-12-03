@@ -22,9 +22,12 @@ function App() {
 
 	const handleAlert = (alert: AlertType) => {
 		setAlert(alert)
-		setTimeout(() => {
-			setAlert({ message: "", variant: "" })
-		}, 3000)
+		setTimeout(
+			() => {
+				setAlert({ message: "", variant: "" })
+			},
+			alert.countdown ? alert.countdown * 1000 : 3000,
+		)
 	}
 
 	useEffect(() => {
