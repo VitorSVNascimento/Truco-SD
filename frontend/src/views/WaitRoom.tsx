@@ -56,6 +56,7 @@ export default function waitRoom() {
 				state: {
 					props: {
 						playersNames: [...playersNames],
+						cards: cards.cards,
 						isLeader,
 					},
 				},
