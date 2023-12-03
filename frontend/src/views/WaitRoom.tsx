@@ -13,9 +13,10 @@ export default function waitRoom() {
 	const { props } = location.state
 	const [playersNames, setPlayersNames] = useState<string[]>(props.playersNames)
 	const isLeader = props.isLeader
+	const room = props.room
 
 	useEffect(() => {
-		console.log("user waitRoom", user)
+		// console.log("user waitRoom", user)
 		if (user === null) {
 			navigate("/")
 		}
@@ -39,17 +40,41 @@ export default function waitRoom() {
 		// Cleanup function to remove the event listeners when the component unmounts
 		return () => {
 			socket.off("your_cards")
+			socket.off("connect_successfully")
 		}
 	}, [])
 
 	return (
 		<>
 			<div className="flex min-h-screen flex-col items-center gap-10 bg-slate-400 p-10 text-slate-100 md:gap-28">
-				<div className="text-center">
-					<Icon className="animate-spin duration-100" fontSize="large">
-						hourglass_empty
-					</Icon>
-					<h1 className="text-3xl">Sala de Espera</h1>
+				<div className="flex w-full justify-between">
+					<div className="invisible">
+						<span className="inline-flex items-center rounded-md bg-blue-50 px-2 py-1 text-xs font-medium text-blue-700 ring-1 ring-inset ring-blue-700/10">
+							<div>Sala: {room}</div>
+							<Icon>content_copy</Icon>
+						</span>
+					</div>
+					<div className="text-center">
+						<Icon className="animate-spin" fontSize="large">
+							hourglass_empty
+						</Icon>
+						<h1 className="text-3xl">Sala de Espera</h1>
+					</div>
+					<div className="flex items-center">
+						<span className="inline-flex items-center gap-2 rounded-md bg-blue-50 px-2 py-1 text-sm font-bold  text-blue-700 ring-1 ring-inset ring-blue-700/10">
+							<div>Sala: {room}</div>
+							<Icon
+								className=""
+								fontSize="small"
+								role="button"
+								onClick={() => {
+									navigator.clipboard.writeText(room)
+								}}
+							>
+								content_copy
+							</Icon>
+						</span>
+					</div>
 				</div>
 				<div className="grid w-full max-w-3xl grow grid-cols-2 gap-5">
 					{playersNames?.map((playerName: any, index: number) => (
