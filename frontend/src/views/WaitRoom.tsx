@@ -2,18 +2,26 @@ import { useEffect, useContext, useState } from "react"
 import { useNavigate, useLocation } from "react-router-dom"
 import { UserContext } from "../contexts/UserContext"
 import SocketContext from "../contexts/SocketContext"
+import EventContext from "../contexts/EventContext"
 import Icon from "@mui/material/Icon"
 import WaitRoomPlayer from "../components/waitRoom/WaitRoomPlayer"
+import { EventData } from "../types/types"
 
 export default function waitRoom() {
 	const socket = useContext(SocketContext)
 	const { user } = useContext(UserContext)
 	const navigate = useNavigate()
 	const location = useLocation()
-	const { props } = location.state
-	const [playersNames, setPlayersNames] = useState<string[]>(props.playersNames)
-	const isLeader = props.isLeader
+	const { props } = location.state || {}
+	const [playersNames, setPlayersNames] = useState<string[]>(props?.playersNames)
+	const isLeader = props?.isLeader
 	const [status, setStatus] = useState("")
+	const { setEventData } = useContext(EventContext)
+	const room = props?.room
+
+	const emitEvent = (data: EventData) => {
+		setEventData(data)
+	}
 
 	const handleStartGame = (event: React.FormEvent) => {
 		event.preventDefault()
@@ -33,7 +41,6 @@ export default function waitRoom() {
 		if (status) setStatus("")
 		socket.emit("start_game")
 	}
-	const room = props.room
 
 	useEffect(() => {
 		// console.log("user waitRoom", user)
@@ -44,8 +51,16 @@ export default function waitRoom() {
 		socket.on("connect_successfully", (data: any) => {
 			console.log("connect_successfully", playersNames)
 			const players = data["players"]
+
 			const team1 = players.at(0)
+			while (team1.length < 2) {
+				team1.push("")
+			}
 			const team2 = players.at(1)
+			while (team2.length < 2) {
+				team2.push("")
+			}
+
 			setPlayersNames([...team1, ...team2])
 		})
 
@@ -71,12 +86,13 @@ export default function waitRoom() {
 		return () => {
 			socket.off("your_cards")
 			socket.off("connect_successfully")
+			socket.off("disconnect")
 		}
 	}, [])
 
 	return (
 		<>
-			<div className="flex min-h-screen flex-col items-center gap-10 bg-slate-400 p-10 text-slate-100 md:gap-28">
+			<div className="flex min-h-screen flex-col items-center gap-10 bg-slate-500 p-10 text-slate-100 md:gap-28">
 				<div className="flex w-full justify-between">
 					<div className="invisible">
 						<span className="inline-flex items-center rounded-md bg-blue-50 px-2 py-1 text-xs font-medium text-blue-700 ring-1 ring-inset ring-blue-700/10">
@@ -99,6 +115,13 @@ export default function waitRoom() {
 								role="button"
 								onClick={() => {
 									navigator.clipboard.writeText(room)
+									emitEvent({
+										event: "alert",
+										data: {
+											message: "Sala copiada para a área de transferência",
+											variant: "info",
+										},
+									})
 								}}
 							>
 								content_copy

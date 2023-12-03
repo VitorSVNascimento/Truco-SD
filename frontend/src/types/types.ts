@@ -10,3 +10,14 @@ export interface User {
     username: string,
     room?: string
 }
+
+export interface AlertType {
+    message: string,
+    variant: string,
+    countdown?: number
+}
+
+export interface EventData {
+    event: string,
+    data: any
+}

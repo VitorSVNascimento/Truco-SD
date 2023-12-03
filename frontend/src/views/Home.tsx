@@ -109,14 +109,12 @@ export default function Home() {
 		// Cleanup function to remove the event listeners when the component unmounts
 		return () => {
 			socket.off("connect")
-			socket.off("game_created")
 			socket.off("connect_error")
 		}
 	}, [])
 
 	useEffect(() => {
 		// this will be called every time the firstConnect state changes
-		console.log("firstConnect", firstConnect)
 		if (firstConnect) {
 			if (room) connectGame(room)
 			else createGame()
@@ -151,6 +149,7 @@ export default function Home() {
 				state: {
 					props: {
 						playersNames: [...team1, ...team2],
+						room: data.room,
 						isLeader,
 					},
 				},
