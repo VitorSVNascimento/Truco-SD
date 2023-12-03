@@ -1,5 +1,4 @@
 from typing import List
-from models.hand import BASE_HAND_VALUE
 from models.player import Player
 
 ''' O número máximo de jogadores permitidos em um time. '''
@@ -60,6 +59,7 @@ class Team:
         Incrementa a pontuação da mão do time com um valor.
         :param hand_value: Um valor inteiro a ser adicionado à pontuação da mão do time.
         """
+        from models.hand import BASE_HAND_VALUE
         if hand_value >= BASE_HAND_VALUE:
             self.hand_score += hand_value
 
@@ -92,3 +92,12 @@ class Team:
             # 'hand_score': self.hand_score,
             'games_won': self.games_won
         } 
+    
+    def contains_player(self,username:str) -> bool:
+        return any(player.name == username for player in self.players)
+    
+    def get_player_by_username(self,username:str) -> Player:
+        for player in self.players:
+            if player.name == username:
+                return player
+        return None
