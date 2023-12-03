@@ -66,20 +66,20 @@ def join(data):
                 server.socketio.emit(
                     'connect_successfully', {'username':playName, 'players':team_userNames,'room':id}, to=id)
                 server.socketio.emit(
-                    'room_message', {status: RM_SUCCESS, message: f'{playName} has created and intered on room {id} '}, to=id)
+                    'room_message', {'status': RM_SUCCESS, 'message': f'{playName} has created and intered on room {id} '}, to=id)
                 
             else:
                 # Time cheio
                 server.socketio.emit(
-                    'room_message', {status: RM_TEAM_IS_FULL, message: f'Team {team_id} on room {id} is full'}, to=request.sid)
+                    'room_message', {'status': RM_TEAM_IS_FULL, 'message': f'Team {team_id} on room {id} is full'}, to=request.sid)
         else:
             # Sala cheia
             server.socketio.emit(
-                'room_message', {status: RM_ROOM_IS_FULL, message: f'Room {id} is full.'}, to=request.sid)
+                'room_message', {'status': RM_ROOM_IS_FULL, 'message': f'Room {id} is full.'}, to=request.sid)
     else:
         # Sala inexistente
         server.socketio.emit(
-            'room_message', {status: RM_ROOM_NOT_EXIST, message: f'Room {id} does not exist.'}, to=request.sid)
+            'room_message', {'status': RM_ROOM_NOT_EXIST, 'message': f'Room {id} does not exist.'}, to=request.sid)
 
 @server.socketio.on('start_game')
 def start():
@@ -98,7 +98,7 @@ def throw(data):
     card_code = data['card_code']
     for player in game_list.games[id - 1].player_order:
         if player.sid == request.sid:
-            result = player.throw_card_using_code(card_code)
+            result = game_list.games[id -1].throw_card()
             if result is not None:
                 card = Card(card_code)
                 server.socketio.emit("throwed_card", {'username' : player.name, 'card' : card.to_json()}, to=id)

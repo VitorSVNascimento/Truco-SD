@@ -3,6 +3,7 @@ from models.bot import Bot
 from models.team import Team
 from models.card import Card
 from .player import Player
+from .hand_resullt import HandResult
 from .hand import Hand
 
 TEAM_ONE = 1
@@ -12,17 +13,21 @@ PLAYERS_AMOUNT = 4
 FIRST_PLAYER = 0
 
 SUCCESS = 200
+END_HAND = 201
+END_ROUND = 202
 NOT_IN_THIS_GAME = 400
 ITS_NOT_YOUR_TURN = 401
 '''
 Códigos das mensagens de erro
 '''
-
+LAST_ROUND = 3
 
 messages = {
-    SUCCESS:'Sucesso',
-    NOT_IN_THIS_GAME:'Você não está nesta partida',
-    ITS_NOT_YOUR_TURN:'Não é sua vez de jogar'
+    SUCCESS : 'Sucesso',
+    NOT_IN_THIS_GAME : 'Você não está nesta partida',
+    ITS_NOT_YOUR_TURN : 'Não é sua vez de jogar',
+    END_HAND : 'A mão foi encerrada',
+    END_ROUND : 'O round foi encerrado'
 }
 '''
 JSON de mensagens de erro
@@ -153,7 +158,8 @@ class Game:
         """
         Cria a pilha de cada jogador no baralho e distribui as cartas para cada jogador.
         """
-        # ESSA LÓGICA DEVE MUDAR PARA TRATAR POSSÍVEIS ERROS DE REQUISIÇÃO DA API DECK OF CARDS
+        Requests.remove_all_cards_of_pile(deck_id)
+        Requests.reshuffle_deck(deck_id)
         for player in players:
             # Retirando as cartas do baralho para poder adicionar na pilha do jogador.
             response = Requests.draw_cards(deck_id, CARDS_PER_PLAYER)
@@ -183,17 +189,30 @@ class Game:
     def throw_card(self,card:Card,username:str):
         if username != self.player_order[FIRST_PLAYER].name:
             return ITS_NOT_YOUR_TURN
-        player_current = self.player_order[FIRST_PLAYER]
         
+        player_current = self.player_order[FIRST_PLAYER]
+        player_current.throw_card(card)
         self.current_hand.throw_card(player_current,card,self.find_player_team(player_current))
-        self.player_order.pop()
+        self.player_order.pop(0)
+
         winner = self.current_hand.get_round_winner()
-        if not self.player_order or winner != 0:
-            if self.current_hand.round == 3:
-                pass
-            else:
-                self.current_hand.__next_round()
-            self.__define_player_order()
+        if winner != None:
+            #Alguém venceu o round
+            hand_result : HandResult = self.current_hand.get_winner()
+            
+            if hand_result.team_winner != None:
+                #Alguém venceu a mão
+                self.teams[self.teams.index(hand_result.team_winner)].increment_score(hand_result.hand_value)
+                self.__define_player_order_by_last_winner(hand_result.next_player.name)
+                [player.cards.clear() for player in self.player_order]
+                self.__create_players_piles(self.deck['deck_id'], self.player_order)
+                return messages[END_HAND]
+            
+            self.__define_player_order_by_last_winner(winner.name)
+            [player.cards.clear() for player in self.player_order]
+            self.__create_players_piles(self.deck['deck_id'], self.player_order)
+            return messages[END_ROUND]
+        return messages[SUCCESS]
 
     def find_player_team(self, player:Player) -> Team:
         for team in self.teams:
