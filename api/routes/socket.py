@@ -138,3 +138,30 @@ def handle_message(data):
 
     # by including include_self=False, the message wont be sent to the client that sent the message
     server.socketio.emit('new_message', data, to=room)
+
+@server.socketio.on('call_truco')
+def call_truco():
+    print('Chegou no call_truco!')
+    id = game_list.sids[request.sid]
+    player = game_list.games[id - 1].get_player_sid(request.sid)
+    opponent = game_list.games[id-1].call_truco(player)
+
+    print(player.to_json())
+    print(opponent.to_json())
+    [server.socketio.emit('receive_truco',{'username': player.name},to=opponent_player.sid) for opponent_player in opponent.players]
+
+@server.socketio.on('accept_truco')
+def accept_truco():
+    id = game_list.sids[request.sid]
+    player = game_list.games[id - 1].get_player_sid(request.sid)
+    result = game_list.games[id -1].truco_response(1, player)
+
+    if result == 1:
+        server.socketio.emit("accepted_truco", to=id)
+    elif result == 2:
+        server.socketio.emit("declined_truco", to=id)
+    
+
+@server.socketio.on('decline_truco')
+def decline_truco():
+    pass
