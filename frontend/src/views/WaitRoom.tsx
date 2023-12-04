@@ -15,7 +15,6 @@ export default function waitRoom() {
 	const { props } = location.state || {}
 	const [playersNames, setPlayersNames] = useState<string[]>(props?.playersNames)
 	const isLeader = props?.isLeader
-	const [status, setStatus] = useState("")
 	const { setEventData } = useContext(EventContext)
 	const room = props?.room
 
@@ -38,7 +37,6 @@ export default function waitRoom() {
 	}
 
 	const startGame = () => {
-		if (status) setStatus("")
 		socket.emit("start_game")
 	}
 
