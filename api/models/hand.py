@@ -26,6 +26,7 @@ class Hand:
         self.hand_value = BASE_HAND_VALUE
         self.table_cards = [[],[],[]]
         self.hand_winners = []
+        self.truco_responses = []
 
     def throw_card(self, player: Player, card: Card, team: Team):
         self.table_cards[self.round].append({
@@ -115,5 +116,15 @@ class Hand:
         self.hand_value = BASE_HAND_VALUE
         self.round = 0
     
+    def set_responses(self, player, response):
+        self.truco_responses.append({'player':player, 'response' : response})
     
-
+    def check_response(self):
+        if len(self.truco_responses) == 1:
+            return 0
+        if self.truco_responses[0]['response'] == 1 and self.truco_responses[1]['response'] == 1:
+            self.truco_responses = []
+            return 1
+        self.truco_responses = []
+        return 2  
+ 

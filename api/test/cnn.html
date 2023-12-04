@@ -27,6 +27,11 @@
     <ul id="messages"></ul>
     <input type="text" id="myMessage">
     <button id="sendbutton">Send</button>
+
+    <button id="truco">Truco</button>
+    <button id="acceptTruco">Truco</button>
+    <button id="declineTruco">Truco</button>
+    
 <script type="text/javascript">
 $(document).ready(function() {
 
@@ -83,13 +88,31 @@ $(document).ready(function() {
     socket.on('round_order', function(data){
         console.log(data)
     })
+
     socket.on('end_hand', function(data){
         console.log(data)
     })
+
     socket.on('end_round', function(data){
         console.log(data)
     })
 
+    $('#truco').on('click', function(){
+        socket.emit('call_truco');
+    })
+
+  socket.on('receive_truco', function(data){
+        console.log(data);
+    })
+
+    $('#acceptTruco').on('click', function(){
+        socket.emit('accept_truco');
+    })
+
+    $('#declineTruco').on('click', function(){
+        socket.emit('decline_truco')
+    })
+   
 
 });
 </script>
