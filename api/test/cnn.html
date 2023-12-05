@@ -29,8 +29,8 @@
     <button id="sendbutton">Send</button>
 
     <button id="truco">Truco</button>
-    <button id="acceptTruco">Truco</button>
-    <button id="declineTruco">Truco</button>
+    <button id="acceptTruco">Acept</button>
+    <button id="declineTruco">Decline</button>
     
 <script type="text/javascript">
 $(document).ready(function() {
@@ -76,6 +76,18 @@ $(document).ready(function() {
         socket.emit('throw_card', {card_code : id_card});
     });
 
+    $('#truco').on('click', function(){
+        socket.emit('call_truco');
+    })
+
+    $('#acceptTruco').on('click', function(){
+        socket.emit('accept_truco');
+    })
+
+    $('#declineTruco').on('click', function(){
+        socket.emit('decline_truco')
+    })
+
     socket.on('throwed_card',function(msg){
         $("#messages").append('<li>'+msg+'</li>');
         console.log(msg);
@@ -97,21 +109,23 @@ $(document).ready(function() {
         console.log(data)
     })
 
-    $('#truco').on('click', function(){
-        socket.emit('call_truco');
-    })
-
-  socket.on('receive_truco', function(data){
+  socket.on('accepted_truco', function(data){
         console.log(data);
     })
 
-    $('#acceptTruco').on('click', function(){
-        socket.emit('accept_truco');
+    socket.on('receive_truco', function(data){
+        console.log(data);
     })
 
-    $('#declineTruco').on('click', function(){
-        socket.emit('decline_truco')
+    socket.on('declined_truco', function(data){
+        console.log(data);
     })
+
+  socket.on('waiting_truco', function(data){
+        console.log(data);
+    })
+   
+
    
 
 });

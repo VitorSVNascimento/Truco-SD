@@ -4,6 +4,7 @@ from models.team import Team
 from models.card import Card
 from .player import Player
 from .hand_resullt import HandResult
+from constants.call_truco_constants import ACCEPT,DECLINE
 from .hand import Hand,DRAW
 
 TEAM_ONE = 1
@@ -21,8 +22,6 @@ ITS_NOT_YOUR_TURN = 401
 Códigos das mensagens de erro
 '''
 LAST_ROUND = 3
-
-
 messages_json = {
     SUCCESS : 'Sucesso',
     NOT_IN_THIS_GAME : 'Você não está nesta partida',
@@ -206,15 +205,9 @@ class Game:
         if winner != None:
             #Alguém venceu o round
             hand_result : HandResult = self.current_hand.get_winner()
-            print('------------hand result----------')
-            print(hand_result.to_json())
             if hand_result.team_winner != None:
                 #Alguém venceu a mão
-                self.teams[self.teams.index(hand_result.team_winner)].increment_score(hand_result.hand_value)
-                self.__define_player_order_by_last_winner(hand_result.next_player.name)
-                [player.cards.clear() for player in self.player_order]
-                self.__create_players_piles(self.deck['deck_id'], self.player_order)
-                return hand_result
+                return self.end_hand(hand_result)
             
 
             self.__define_player_order_by_last_winner(winner.name)
@@ -261,9 +254,33 @@ class Game:
     
     def call_truco(self, player):
         team = self.find_player_team(player)
-        return self.team_opponent(team)
+        if self.current_hand.waiting_truco:
+            self.current_hand.buff_hand_value()
+            self.current_hand.truco_responses = []
+        else:
+            self.current_hand.waiting_truco = True
+        return team
         
     def truco_response(self, response, player):
+        hand_result = None
         self.current_hand.set_responses(player, response)
-        return self.current_hand.check_response()
+        response = self.current_hand.check_response()
+        if response == ACCEPT or response == DECLINE:
+            self.current_hand.waiting_truco = False
+            if response == ACCEPT:
+                self.current_hand.buff_hand_value()
+            else:
+                next_player = self.current_hand.get_next_player()
+                if next_player == None:
+                    next_player = self.player_order[1] if len(self.player_order) == 4 else self.player_order[0] 
+                hand_result = HandResult(self.team_opponent(self.find_player_team(player)),self.current_hand.hand_value,next_player)
+                self.end_hand(hand_result)
+        return response,hand_result
+
+    def end_hand(self,hand_result:HandResult) -> HandResult:
+        self.teams[self.teams.index(hand_result.team_winner)].increment_score(hand_result.hand_value)
+        self.__define_player_order_by_last_winner(hand_result.next_player.name)
+        [player.cards.clear() for player in self.player_order]
+        self.__create_players_piles(self.deck['deck_id'], self.player_order)
+        return hand_result
 

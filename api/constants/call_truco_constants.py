@@ -1,0 +1,3 @@
+ACCEPT = 1
+DECLINE = 2
+WAITING = 3

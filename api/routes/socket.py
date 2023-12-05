@@ -2,7 +2,8 @@ from flask import request
 from flask_socketio import  join_room, emit
 from server.instance import server
 from models.game_list import game_list
-from models.game import Game, TEAM_ONE, TEAM_TWO,messages_json,SUCCESS,END_HAND,END_ROUND
+from models.game import Game, TEAM_ONE, TEAM_TWO
+from constants.call_truco_constants import ACCEPT,DECLINE
 from models.hand import DRAW
 from models.player import Player
 from models.hand_resullt import HandResult
@@ -104,9 +105,7 @@ def throw(data):
             result = game_list.games[id -1].throw_card(card,player.name)
             if isinstance(result,HandResult):
                 server.socketio.emit('throwed_card',{'username' : player.name,'card':card.to_json()},to=id)
-                server.socketio.emit('end_hand',{'new_order':game_list.games[id -1].player_order_to_json()['player_order'],
-                                                 'score':game_list.games[id -1].get_score(),'winner':result.team_winner.id},to=id)
-                [server.socketio.emit('your_cards',player.cards_to_json(),to=player.sid) for player in game_list.games[id - 1].player_order if not player.name.startswith('BOT')]
+                end_hand(result,id)
                 return
             if isinstance(result,Player) or result == DRAW: 
                 server.socketio.emit('throwed_card', {'username' : player.name, 'card' : card.to_json()}, to=id)
@@ -144,24 +143,37 @@ def call_truco():
     print('Chegou no call_truco!')
     id = game_list.sids[request.sid]
     player = game_list.games[id - 1].get_player_sid(request.sid)
-    opponent = game_list.games[id-1].call_truco(player)
+    team = game_list.games[id-1].call_truco(player)
 
-    print(player.to_json())
-    print(opponent.to_json())
-    [server.socketio.emit('receive_truco',{'username': player.name},to=opponent_player.sid) for opponent_player in opponent.players]
+    server.socketio.emit('receive_truco',{'username': player.name,'team':team.id},to=id)
 
 @server.socketio.on('accept_truco')
 def accept_truco():
-    id = game_list.sids[request.sid]
-    player = game_list.games[id - 1].get_player_sid(request.sid)
-    result = game_list.games[id -1].truco_response(1, player)
-
-    if result == 1:
-        server.socketio.emit("accepted_truco", to=id)
-    elif result == 2:
-        server.socketio.emit("declined_truco", to=id)
-    
+    print('acept')
+    response_truco(ACCEPT,request.sid)
 
 @server.socketio.on('decline_truco')
 def decline_truco():
-    pass
+    print('decline')
+    response_truco(DECLINE,request.sid)
+
+def response_truco(response:int,sid):
+    print('olaaa')
+    id = game_list.sids[sid]
+    player = game_list.games[id - 1].get_player_sid(sid)
+    result,hand_result = game_list.games[id -1].truco_response(response, player)
+
+    if result == ACCEPT:
+        print('entrou')
+        server.socketio.emit('accepted_truco', {'username':player.name,'new_hand_value':game_list.games[id - 1].current_hand.hand_value}, to=id)
+        return
+    elif result == DECLINE:
+        server.socketio.emit('declined_truco', {'username':player.name}, to=id)
+        end_hand(hand_result)
+        return
+    server.socketio.emit('waiting_truco',{'username':player.name,'response':response},to=id)
+
+def end_hand(result:HandResult,id:int):
+    server.socketio.emit('end_hand',{'new_order':game_list.games[id -1].player_order_to_json()['player_order'],
+                                                 'score':game_list.games[id -1].get_score(),'winner':result.team_winner.id},to=id)
+    [server.socketio.emit('your_cards',player.cards_to_json(),to=player.sid) for player in game_list.games[id - 1].player_order if not player.name.startswith('BOT')]
