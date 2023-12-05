@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<svg viewBox="0 0 500 500" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:bx="https://boxy-svg.com">
+  <defs>
+    <radialGradient gradientUnits="userSpaceOnUse" cx="250" cy="250" r="250" id="gradient-0" gradientTransform="matrix(3.184236, 0.037182, -0.025957, 2.222953, -539.569776, -315.03369)">
+      <stop offset="0" style="stop-color: rgb(99.216% 84.706% 8.6275%)"/>
+      <stop offset="1" style="stop-color: rgb(57.526% 48.269% 0%)"/>
+    </radialGradient>
+    <radialGradient gradientUnits="userSpaceOnUse" cx="259.446" cy="429.766" r="37.713" id="gradient-1">
+      <stop offset="0" style="stop-color: rgb(90.196% 23.529% 25.49%)"/>
+      <stop offset="1" style="stop-color: rgb(61.822% 0% 9.3241%)"/>
+    </radialGradient>
+    <path id="path-0" d="M 221.698 442.662 C 307.625 445.493 372.433 414.401 417.925 364.361 C 448.28 331.913 460.377 308.977 460.377 278.512" style="fill: none;"/>
+    <radialGradient gradientUnits="userSpaceOnUse" cx="234.255" cy="240.812" r="63.18" id="gradient-2" gradientTransform="matrix(0.999999, 0, 0, 0.999999, 0.000098, -0.000003)">
+      <stop offset="0" style="stop-color: rgb(90.196% 23.529% 25.49%)"/>
+      <stop offset="1" style="stop-color: rgb(61.822% 0% 9.3241%)"/>
+    </radialGradient>
+    <radialGradient gradientUnits="userSpaceOnUse" cx="328.377" cy="170.021" r="18" id="gradient-3">
+      <stop offset="0" style="stop-color: rgb(90.196% 23.529% 25.49%)"/>
+      <stop offset="1" style="stop-color: rgb(61.822% 0% 9.3241%)"/>
+    </radialGradient>
+    <style bx:fonts="Abril Fatface">@import url(https://fonts.googleapis.com/css2?family=Abril+Fatface%3Aital%2Cwght%400%2C400&amp;display=swap);</style>
+  </defs>
+  <path d="M 35 0 H 465.001 V 35 H 500 V 465.001 H 465.001 V 500 H 35 V 465.001 H 0 V 35 H 35 Z" style="paint-order: fill; fill: url('#gradient-0'); stroke: rgba(176, 148, 0, 0.973); stroke-width: 5px; stroke-linejoin: round;" bx:shape="cross 0 0 500 500 430.001 430.001 0.5 1@969782cb"/>
+  <text style="fill: url('#gradient-1'); font-family: 'Abril Fatface'; font-size: 50.9177px; font-style: italic; letter-spacing: 5.1px; line-height: 81.4684px; text-transform: uppercase; word-spacing: 5.3px; white-space: pre; transform-origin: 347.761px 366.386px;" transform="matrix(1.40734398365, -0.273559987545, 0.273559987545, 1.40734398365, 12.805977586297, -13.298227140187)"><textPath xlink:href="#path-0">Truco SD</textPath></text>
+  <path d="M 218.868 230.398 Q 218.868 227.545 221.465 225.899 Q 224.239 224.142 227.865 225.204 Q 231.896 226.384 234.451 230.398 Q 237.322 234.908 236.862 240.787 Q 236.347 247.361 231.854 252.891 Q 226.878 259.015 218.868 261.565 Q 210.086 264.36 200.687 261.888 Q 190.476 259.201 182.88 251.176 Q 174.691 242.525 172.118 230.398 Q 169.363 217.414 173.883 204.426 Q 178.694 190.6 190.298 180.914 Q 202.59 170.655 218.868 168.065 Q 236.036 165.332 252.632 171.917 Q 270.07 178.836 281.847 194.037 Q 294.182 209.957 296.785 230.398 Q 299.503 251.745 290.844 271.954 Q 281.825 293.004 263.021 306.873 Q 257.301 311.091 250.943 314.36" style="fill: rgba(255, 255, 255, 0); stroke-width: 12px; stroke: url('#gradient-2'); stroke-opacity: 0.87; stroke-linejoin: round; stroke-linecap: round; transform-origin: 234.254px 240.812px;" transform="matrix(-0.434756010771, -1.166658997536, 1.248962044716, -0.431778967381, -5.188675251064, -18.867927791057)" bx:shape="spiral 218.868 230.398 0 89.88 0 519.092 1@b4d32ecb"/>
+  <path d="M 310.377 163.021 H 310.377 L 310.377 151.021 L 346.377 170.021 L 310.377 189.021 L 310.377 177.021 H 310.377 V 163.021 Z" style="fill: url('#gradient-3'); stroke: rgba(0, 0, 0, 0);" transform="matrix(0.7840459942817688, 0.6207029819488525, -0.6207029819488525, 0.7840459942817688, 172.55978393554688, -155.9354248046875)" bx:shape="arrow 310.377 151.021 36 38 14 36 0 1@ece7e760"/>
+</svg>
