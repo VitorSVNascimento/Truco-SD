@@ -71,7 +71,12 @@ class Game:
         self.started = True
 
         
-
+    def get_player_sid(self,sid) -> Player:
+        for team in self.teams:
+            for player in team.players:
+                if player.sid == sid:
+                    return player
+        return None
     def game_over():
         pass
 
@@ -250,3 +255,15 @@ class Game:
     
     def get_score(self,):
         return [self.teams[TEAM_ONE -1].score,self.teams[TEAM_TWO -1].score]
+
+    def team_opponent(self,team:Team):
+        return self.teams[1] if team.id == TEAM_ONE else self.teams[0]
+    
+    def call_truco(self, player):
+        team = self.find_player_team(player)
+        return self.team_opponent(team)
+        
+    def truco_response(self, response, player):
+        self.current_hand.set_responses(player, response)
+        return self.current_hand.check_response()
+

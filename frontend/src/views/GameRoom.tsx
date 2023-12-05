@@ -11,6 +11,7 @@ export default function gameRoom() {
 	const [hoveredIndex, setHoveredIndex] = useState<number | null>(null)
 
 	const toggleChat = () => {
+	const toggleChat = () => {
 		const chat = document.querySelector("#chat")
 		const button = document.querySelector("#toggleChatButton")
 		chat?.classList.toggle("hidden")
@@ -101,6 +102,7 @@ export default function gameRoom() {
 					</div>
 				</div>
 			</div>
+			<div className="md:col-span-4 md:justify-center"></div>
 			<div
 				id="chat"
 				className="absolute left-0 top-0 hidden w-full md:relative md:col-span-1 md:block md:opacity-100"

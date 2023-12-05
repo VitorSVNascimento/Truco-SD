@@ -6,6 +6,7 @@ import EventContext from "../contexts/EventContext"
 import Icon from "@mui/material/Icon"
 import WaitRoomPlayer from "../components/waitRoom/WaitRoomPlayer"
 import { EventData } from "../types/types"
+import { playAudio } from "../utils/utils"
 
 export default function waitRoom() {
 	const socket = useContext(SocketContext)
@@ -15,7 +16,6 @@ export default function waitRoom() {
 	const { props } = location.state || {}
 	const [playersNames, setPlayersNames] = useState<string[]>(props?.playersNames)
 	const isLeader = props?.isLeader
-	const [status, setStatus] = useState("")
 	const { setEventData } = useContext(EventContext)
 	const room = props?.room
 
@@ -38,7 +38,6 @@ export default function waitRoom() {
 	}
 
 	const startGame = () => {
-		if (status) setStatus("")
 		socket.emit("start_game")
 	}
 
@@ -50,6 +49,7 @@ export default function waitRoom() {
 
 		socket.on("connect_successfully", (data: any) => {
 			console.log("connect_successfully", playersNames)
+			playAudio("sounds/joinBeep.mp3")
 			const players = data["players"]
 
 			const team1 = players.at(0)
@@ -66,7 +66,7 @@ export default function waitRoom() {
 
 		socket.on("your_cards", (cards: any) => {
 			console.log("your_cards", cards)
-
+			playAudio("sounds/shufflingCards.wav")
 			navigate("/gameRoom", {
 				state: {
 					props: {

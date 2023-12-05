@@ -128,9 +128,10 @@ export default function Home() {
 			const isLeader = !room
 			if (isLeader) {
 				setRoom(data.room)
+				setUsername(data.username)
 				setUser({
 					id: socket.id,
-					username,
+					username: data.username,
 					room: data.room,
 				})
 			}
