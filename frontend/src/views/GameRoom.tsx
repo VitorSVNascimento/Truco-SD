@@ -2,6 +2,16 @@ import { useState } from "react"
 import { useLocation } from "react-router-dom"
 import Chat from "./Chat"
 import Icon from "@mui/material/Icon"
+import { socket } from "../socket"
+import { Button } from "@/components/ui/button"
+import {
+	Dialog,
+	DialogContent,
+	DialogDescription,
+	DialogHeader,
+	DialogTitle,
+	DialogTrigger,
+} from "@/components/ui/dialog"
 
 export default function gameRoom() {
 	const location = useLocation()
@@ -9,6 +19,7 @@ export default function gameRoom() {
 	const [cards] = useState(props.cards)
 	// const [playersNames] = useState(props.playersNames)
 	const [hoveredIndex, setHoveredIndex] = useState<number | null>(null)
+	const [waitingTruco, setWaitingTruco] = useState(false)
 
 	const toggleChat = () => {
 		const chat = document.querySelector("#chat")
@@ -21,6 +32,11 @@ export default function gameRoom() {
 		console.log("Players", props.playersNames)
 	}
 
+	const callTruco = () => {
+		socket.emit("call_truco")
+		setWaitingTruco(true)
+	}
+
 	return (
 		<div className="min-h-screen bg-gradient-to-bl from-blue-700 via-blue-800 to-slate-700 text-white/90 md:grid md:grid-cols-5 md:content-normal md:gap-4 md:bg-white/90">
 			<div className="md:col-span-4 md:justify-center">
@@ -31,9 +47,7 @@ export default function gameRoom() {
 							<div className="row-span-1 items-center justify-center">
 								<div className="grid h-full grid-cols-3">
 									<div className="col-span-1 items-center justify-center"></div>
-									<div className="col-span-1 items-center justify-center">
-										
-									</div>
+									<div className="col-span-1 items-center justify-center"></div>
 									<div className="col-span-1 items-center justify-center"></div>
 								</div>
 							</div>
@@ -80,8 +94,9 @@ export default function gameRoom() {
 									</div>
 								</div>
 							</div>
-							<div className="row-span-2">
-								<div className="row-span-1  flex items-center justify-center">
+							<div className="row-span-2 grid grid-cols-3">
+								<div></div>
+								<div className="row-span-1 flex items-center justify-center">
 									{cards.map((c: { code: null | undefined; url_image: string }, index: number) => (
 										<button
 											className={`m-1 w-16 transform transition-transform hover:translate-y-[-7px] md:w-28 ${
@@ -95,6 +110,24 @@ export default function gameRoom() {
 											<img className="img-responsive" src={c.url_image} />
 										</button>
 									))}
+								</div>
+								<div className="flex items-center">
+									<Dialog>
+										<DialogTrigger asChild>
+											<Button className="bg-orange-500 hover:bg-orange-600" onClick={callTruco}>
+												Trucar
+											</Button>
+										</DialogTrigger>
+										<DialogContent className="bg-slate-700 sm:max-w-[425px]">
+											<DialogHeader>
+												<DialogTitle className="text-slate-100">Truco</DialogTitle>
+												<DialogDescription></DialogDescription>
+											</DialogHeader>
+											<div className="grid gap-4 py-4 text-slate-300">
+												Aguardando jogadores adversários...
+											</div>
+										</DialogContent>
+									</Dialog>
 								</div>
 							</div>
 						</div>

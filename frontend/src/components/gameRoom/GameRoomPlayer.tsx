@@ -1,10 +1,10 @@
-export default function GameRoomPlayer(props: { playerName: string, cardsNumber: any }) {
-    const imageSrc = "http://127.0.0.1:8000/static/img/back.png"
+export default function GameRoomPlayer(props: { playerName: string; cardsNumber: any }) {
+	const imageSrc = "http://127.0.0.1:8000/static/img/back.png"
 
 	return (
 		<>
 			<div className="relative left-1/2">
-				{Array.from({ length: props.cardsNumber}, (_, index) => (
+				{Array.from({ length: props.cardsNumber }, (_, index) => (
 					<div key={index}>
 						<img
 							className={`absolute 
