@@ -18,9 +18,9 @@ export default function gameRoom() {
 	const location = useLocation()
 	const { props } = location.state || {}
 	const [cards, setCards] = useState(props.cards)
-	const [player] = useState(props.player)
-	// const [ playersNames ] = useState(props.playersNames)
-	const [roundOrder] = useState(props.roundOrder)
+	const [player] = useState(props?.player)
+	// const [ players ] = useState(props?.players)
+	const [roundOrder] = useState(props?.roundOrder)
 	const [hoveredIndex, setHoveredIndex] = useState<number | null>(null)
 	const [waitingAcceptTruco, setWaitingAcceptTruco] = useState(false)
 	const [trucoRequested, setTrucoRequested] = useState(false)
@@ -40,7 +40,8 @@ export default function gameRoom() {
 
 	const throwCard = (code: any) => {
 		setCards(cards.filter((card: { code: string }) => card.code != code))
-		socket.emit("throw_card", { "card_code": code })
+		// eslint-disable-next-line camelcase
+		socket.emit("throw_card", { card_code: code })
 		console.log("Cartas", cards)
 	}
 
@@ -62,25 +63,25 @@ export default function gameRoom() {
 	const raiseTruco = () => {
 		socket.emit("call_truco")
 		setTrucoRequested(false)
-	}	
+	}
 
 	const reorganizeTableOrder = () => {
-		const playerIndex = roundOrder.indexOf(player.name);
-  
+		const playerIndex = roundOrder.indexOf(player.name)
+
 		const newArray = roundOrder
 			.slice(playerIndex)
 			.concat(roundOrder.slice(0, playerIndex))
 			.map((playerName: string) => ({
-			name: playerName,
-			cardsCount: 3, 
-			}));
+				name: playerName,
+				cardsCount: 3,
+			}))
 
-		setTableOrder(newArray);
-	};
+		setTableOrder(newArray)
+	}
 
 	useEffect(() => {
-		reorganizeTableOrder();
-	}, []);
+		reorganizeTableOrder()
+	}, [])
 
 	useEffect(() => {
 		socket.on("receive_truco", (data: any) => {
@@ -106,11 +107,17 @@ export default function gameRoom() {
 			console.log("throwed_card", data)
 		})
 
+		socket.on("your_cards", (cards: any) => {
+			console.log("your_cards", cards)
+			// setCards(cards)
+		})
+
 		return () => {
 			socket.off("receive_truco")
 			socket.off("accepted_truco")
 			socket.off("declined_truco")
 			socket.off("throwed_card")
+			socket.off("your_cards")
 		}
 	}, [waitingAcceptTruco])
 
@@ -121,13 +128,15 @@ export default function gameRoom() {
 					{/* Mesa */}
 					<div className="row-span-5 ">
 						<div className="m-0 grid h-full grid-rows-6 gap-2 p-0 ">
-
 							<div className="row-span-1 items-center justify-center">
 								<div className="grid h-full grid-cols-3">
 									<div className="col-span-1 items-center justify-center"></div>
 									<div className="col-span-1 flex items-center justify-center">
 										{tableOrder.length > PLAYER_POSITION_TOP && (
-											<GameRoomPlayer playerName={tableOrder[PLAYER_POSITION_TOP].name} cardsNumber={tableOrder[PLAYER_POSITION_TOP].cardsCount} />
+											<GameRoomPlayer
+												playerName={tableOrder[PLAYER_POSITION_TOP].name}
+												cardsNumber={tableOrder[PLAYER_POSITION_TOP].cardsCount}
+											/>
 										)}
 									</div>
 									<div className="col-span-1 items-center justify-center"></div>
@@ -138,13 +147,19 @@ export default function gameRoom() {
 								<div className="grid h-full grid-cols-8 gap-2">
 									<div className="col-span-2 flex items-center justify-center">
 										{tableOrder.length > PLAYER_POSITION_LEFT && (
-											<GameRoomPlayer playerName={tableOrder[PLAYER_POSITION_LEFT].name} cardsNumber={tableOrder[PLAYER_POSITION_LEFT].cardsCount} />
+											<GameRoomPlayer
+												playerName={tableOrder[PLAYER_POSITION_LEFT].name}
+												cardsNumber={tableOrder[PLAYER_POSITION_LEFT].cardsCount}
+											/>
 										)}
 									</div>
 									<div className="col-span-4 rounded-full border-4 border-orange-400 bg-green-500"></div>
 									<div className="col-span-2 flex items-center justify-center">
 										{tableOrder.length > PLAYER_POSITION_RIGHT && (
-											<GameRoomPlayer playerName={tableOrder[PLAYER_POSITION_RIGHT].name} cardsNumber={tableOrder[PLAYER_POSITION_RIGHT].cardsCount} />
+											<GameRoomPlayer
+												playerName={tableOrder[PLAYER_POSITION_RIGHT].name}
+												cardsNumber={tableOrder[PLAYER_POSITION_RIGHT].cardsCount}
+											/>
 										)}
 									</div>
 								</div>
@@ -181,9 +196,7 @@ export default function gameRoom() {
 											(c: { code: null | undefined; url_image: string }, index: number) => (
 												<button
 													className={`m-1 w-14 md:w-28 ${
-														myTurn
-															? "transform transition-transform hover:translate-y-[-7px]"
-															: ""
+														myTurn ? "transform transition-transform hover:translate-y-[-7px]" : ""
 													} ${
 														!myTurn
 															? "opacity-80 grayscale"
@@ -208,12 +221,11 @@ export default function gameRoom() {
 												{player.name}
 											</div>
 											{myTurn && (
-												<div className="row-span-1 font-mono text-1xl font-semibold antialiased md:text-2xl">
+												<div className="text-1xl row-span-1 font-mono font-semibold antialiased md:text-2xl">
 													Sua vez!
 												</div>
 											)}
 										</div>
-										
 									</div>
 								</div>
 							</div>
