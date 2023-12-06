@@ -17,13 +17,14 @@ import GameRoomPlayer from "../components/gameRoom/GameRoomPlayer"
 export default function gameRoom() {
 	const location = useLocation()
 	const { props } = location.state || {}
-	const [cards] = useState(props.cards)
+	const [cards, setCards] = useState(props.cards)
 	const [player] = useState(props.player)
 	// const [ playersNames ] = useState(props.playersNames)
 	const [roundOrder] = useState(props.roundOrder)
 	const [hoveredIndex, setHoveredIndex] = useState<number | null>(null)
 	const [waitingAcceptTruco, setWaitingAcceptTruco] = useState(false)
 	const [trucoRequested, setTrucoRequested] = useState(false)
+	const [tableOrder, setTableOrder] = useState("")
 	const [TRICK_AUDIO] = useState(7)
 
 	const toggleChat = () => {
@@ -33,14 +34,14 @@ export default function gameRoom() {
 		button?.classList.toggle("hidden")
 	}
 
-	const throwCard = () => {
-		console.log("Players", props.playersNames)
+	const throwCard = (code: any) => {
+		setCards(cards.filter((card: { code: string }) => card.code != code))
+		socket.emit("throw_card", { "card_code": code })
 		console.log("Cartas", cards)
 	}
 
 	const callTruco = () => {
 		socket.emit("call_truco")
-
 		console.log("TRUCOOOOOOOOOO")
 	}
 
@@ -63,6 +64,16 @@ export default function gameRoom() {
 		return roundOrder.length > 0 && player.name === roundOrder[0]
 	}
 
+	const reorganizeTableOrder = () => {
+		const playerIndex = roundOrder.indexOf(player.name);
+		const newArray = roundOrder.slice(playerIndex).concat(roundOrder.slice(0, playerIndex));
+		setTableOrder(newArray);
+	};
+
+	useEffect(() => {
+		reorganizeTableOrder();
+	}, []);
+
 	useEffect(() => {
 		socket.on("receive_truco", (data: any) => {
 			console.log("receive_truco", data)
@@ -83,10 +94,15 @@ export default function gameRoom() {
 			else setTrucoRequested(false)
 		})
 
+		socket.on("throwed_card", (data) => {
+			console.log("throwed_card", data)
+		})
+
 		return () => {
 			socket.off("receive_truco")
 			socket.off("accepted_truco")
 			socket.off("declined_truco")
+			socket.off("throwed_card")
 		}
 	}, [waitingAcceptTruco])
 
@@ -101,7 +117,7 @@ export default function gameRoom() {
 								<div className="grid h-full grid-cols-3">
 									<div className="col-span-1 items-center justify-center"></div>
 									<div className="col-span-1 flex items-center justify-center">
-										<GameRoomPlayer playerName="ZeLinguica" cardsNumber={3} />
+										<GameRoomPlayer playerName={tableOrder[2]} cardsNumber={3} />
 									</div>
 									<div className="col-span-1 items-center justify-center"></div>
 								</div>
@@ -110,11 +126,11 @@ export default function gameRoom() {
 							<div className="row-span-3">
 								<div className="grid h-full grid-cols-6">
 									<div className="col-span-1 flex items-center justify-center">
-										<GameRoomPlayer playerName="JaoBaitola" cardsNumber={1} />
+										<GameRoomPlayer playerName={tableOrder[3]} cardsNumber={1} />
 									</div>
 									<div className="col-span-4 rounded-full border-4 border-orange-400 bg-green-500"></div>
 									<div className="col-span-1 flex items-center justify-center">
-										<GameRoomPlayer playerName="Chiquinha" cardsNumber={2} />
+										<GameRoomPlayer playerName={tableOrder[1]} cardsNumber={2} />
 									</div>
 								</div>
 							</div>
@@ -163,7 +179,7 @@ export default function gameRoom() {
 													key={c.code}
 													onMouseEnter={() => setHoveredIndex(index)}
 													onMouseLeave={() => setHoveredIndex(null)}
-													onClick={throwCard}
+													onClick={() => throwCard(c.code)}
 													disabled={!isMyTurn()}
 												>
 													<img className="img-responsive" src={c.url_image} />
