@@ -136,21 +136,22 @@ export default function Home() {
 				})
 			}
 
-			const players = data["players"]
+			const dataPlayers = data["players"]
 
-			const team1 = players.at(0)
+			const team1 = dataPlayers.at(0).map((player: string) => ({ name: player, team: "0" }))
 			while (team1.length < 2) {
-				team1.push("")
+				team1.push({ name: "", team: "0" })
 			}
-			const team2 = players.at(1)
+
+			const team2 = dataPlayers.at(1).map((player: string) => ({ name: player, team: "1" }))
 			while (team2.length < 2) {
-				team2.push("")
+				team2.push({ name: "", team: "1" })
 			}
 
 			navigate("/waitRoom", {
 				state: {
 					props: {
-						playersNames: [...team1, ...team2],
+						players: [...team1, ...team2],
 						room: data.room,
 						isLeader,
 					},

@@ -14,7 +14,7 @@ export default function waitRoom() {
 	const navigate = useNavigate()
 	const location = useLocation()
 	const { props } = location.state || {}
-	const [playersNames, setPlayersNames] = useState<string[]>(props?.playersNames)
+	const [players, setPlayers] = useState<any[]>(props?.players)
 	const isLeader = props?.isLeader
 	const { setEventData } = useContext(EventContext)
 	const room = props?.room
@@ -48,21 +48,22 @@ export default function waitRoom() {
 		}
 
 		socket.on("connect_successfully", (data: any) => {
-			console.log("connect_successfully", playersNames)
+			console.log("connect_successfully", players)
 			console.log("My Nickname", data.username)
 			playAudio("sounds/joinBeep.mp3")
-			const players = data["players"]
+			const dataPlayers = data["players"]
 
-			const team1 = players.at(0)
+			const team1 = dataPlayers.at(0).map((player: string) => ({ name: player, team: "team1" }))
 			while (team1.length < 2) {
-				team1.push("")
-			}
-			const team2 = players.at(1)
-			while (team2.length < 2) {
-				team2.push("")
+				team1.push({ name: "", team: "team1" })
 			}
 
-			setPlayersNames([...team1, ...team2])
+			const team2 = dataPlayers.at(1).map((player: string) => ({ name: player, team: "team2" }))
+			while (team2.length < 2) {
+				team2.push({ name: "", team: "team2" })
+			}
+
+			setPlayers([...team1, ...team2])
 		})
 
 		socket.on("your_cards", (initialGameData: any) => {
@@ -71,11 +72,10 @@ export default function waitRoom() {
 			navigate("/gameRoom", {
 				state: {
 					props: {
-						playersNames: [...playersNames],
+						players: [...players],
 						cards: initialGameData.cards,
-						username: initialGameData.username,
+						player: players.find((player) => player.name === initialGameData.username),
 						roundOrder: initialGameData.round_order.player_order,
-						isLeader,
 					},
 				},
 			})
@@ -133,8 +133,8 @@ export default function waitRoom() {
 					</div>
 				</div>
 				<div className="grid w-full max-w-3xl grow grid-cols-2 gap-5">
-					{playersNames?.map((playerName: any, index: number) => (
-						<WaitRoomPlayer key={index} playerName={playerName} />
+					{players?.map((player: any, index: number) => (
+						<WaitRoomPlayer key={index} playerName={player.name} />
 					))}
 				</div>
 				<div>

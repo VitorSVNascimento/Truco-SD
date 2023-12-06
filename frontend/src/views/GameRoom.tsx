@@ -18,11 +18,13 @@ export default function gameRoom() {
 	const location = useLocation()
 	const { props } = location.state || {}
 	const [cards] = useState(props.cards)
-	const [username] = useState(props.username)
+	const [player] = useState(props.player)
 	// const [ playersNames ] = useState(props.playersNames)
 	const [roundOrder] = useState(props.roundOrder)
 	const [hoveredIndex, setHoveredIndex] = useState<number | null>(null)
 	const [waitingAcceptTruco, setWaitingAcceptTruco] = useState(false)
+
+	console.log(player)
 
 	const TRICK_AUDIO = 7
 
@@ -46,22 +48,24 @@ export default function gameRoom() {
 
 	const isMyTurn = () => {
 		roundOrder
-		return roundOrder.length > 0 && username === roundOrder[0]
+		return roundOrder.length > 0 && player.name === roundOrder[0]
 	}
 
 	useEffect(() => {
 		socket.on("receive_truco", (data: any) => {
 			console.log("receive_truco", data)
 			playAudio(`sounds/truco-${Math.floor(Math.random() * TRICK_AUDIO)}.mp3`)
-			setWaitingAcceptTruco(true)
+			if (data.team == player.team) setWaitingAcceptTruco(true)
 		})
 
-		socket.on("accepted_truco", () => {
-			setWaitingAcceptTruco(false)
+		socket.on("accepted_truco", (data) => {
+			console.log("accepted_truco", data)
+			if (waitingAcceptTruco) setWaitingAcceptTruco(false)
 		})
 
-		socket.on("declined_truco", () => {
-			setWaitingAcceptTruco(false)
+		socket.on("declined_truco", (data) => {
+			console.log("declined_truco", data)
+			if (waitingAcceptTruco) setWaitingAcceptTruco(false)
 		})
 
 		return () => {
@@ -154,7 +158,7 @@ export default function gameRoom() {
 									</div>
 									<div className="row-span-1 flex items-center justify-center gap-2">
 										<div className="blockfont-mono text-2xl font-semibold capitalize antialiased md:text-4xl">
-											{username}
+											{player.name}
 										</div>
 										{isMyTurn() && (
 											<div className="blockfont-mono text-1xl font-semibold antialiased md:text-2xl">
