@@ -49,6 +49,7 @@ export default function waitRoom() {
 
 		socket.on("connect_successfully", (data: any) => {
 			console.log("connect_successfully", playersNames)
+			console.log("My Nickname", data.username)
 			playAudio("sounds/joinBeep.mp3")
 			const players = data["players"]
 
@@ -64,14 +65,16 @@ export default function waitRoom() {
 			setPlayersNames([...team1, ...team2])
 		})
 
-		socket.on("your_cards", (cards: any) => {
-			console.log("your_cards", cards)
+		socket.on("your_cards", (initialGameData: any) => {
+			console.log("your_cards", initialGameData)
 			playAudio("sounds/shufflingCards.wav")
 			navigate("/gameRoom", {
 				state: {
 					props: {
 						playersNames: [...playersNames],
-						cards: cards.cards,
+						cards: initialGameData.cards,
+						username: initialGameData.username,
+						roundOrder: initialGameData.round_order.player_order,
 						isLeader,
 					},
 				},
