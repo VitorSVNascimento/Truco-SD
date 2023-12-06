@@ -67,9 +67,9 @@ def join(data):
                     team_userNames.append(team_list)
                 # Entrou no time
                 server.socketio.emit(
-                    'connect_successfully', {'username':playName, 'players':team_userNames,'room':id}, to=id)
+                    'connect_successfully', {'username':playName, 'players':team_userNames, 'room':id}, to=id)
                 server.socketio.emit(
-                    'room_message', {'status': RM_SUCCESS, 'message': f'{playName} has created and intered on room {id} '}, to=id)
+                    'room_message', {'status': RM_SUCCESS, 'message': f'{playName} has intered on room {id} '}, to=id)
                 
             else:
                 # Time cheio
@@ -89,7 +89,7 @@ def start():
     id = game_list.sids[request.sid]
     if request.sid == game_list.games[id - 1].owner.sid:
         game_list.games[id - 1].start()
-        [server.socketio.emit('your_cards',{"cards": player.cards_to_json()["cards"], "round_order": game_list.games[id - 1].player_order_to_json()},to=player.sid) for player in game_list.games[id - 1].player_order if not player.name.startswith('BOT')]
+        [server.socketio.emit('your_cards',{"username": player.name, "cards": player.cards_to_json()["cards"], "round_order": game_list.games[id - 1].player_order_to_json()},to=player.sid) for player in game_list.games[id - 1].player_order if not player.name.startswith('BOT')]
     else:
         server.socketio.emit(
         'room_message', f'Apenas o dono pode iniciar a partida', to=request.sid)
