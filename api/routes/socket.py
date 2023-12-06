@@ -98,23 +98,26 @@ def start():
 def throw(data):
     id = game_list.sids[request.sid]
     card_code = data['card_code']
-    for player in game_list.games[id - 1].player_order:
-        if player.sid == request.sid:
-            
-            card = Card(card_code)
-            result = game_list.games[id -1].throw_card(card,player.name)
-            if isinstance(result,HandResult):
-                server.socketio.emit('throwed_card',{'username' : player.name,'card':card.to_json()},to=id)
-                end_hand(result,id)
-                return
-            if isinstance(result,Player) or result == DRAW: 
-                server.socketio.emit('throwed_card', {'username' : player.name, 'card' : card.to_json()}, to=id)
-                server.socketio.emit('end_round',{'team':game_list.games[id -1].find_player_team(result).id if result != DRAW else DRAW,
-                                                  'new_order':game_list.games[id -1].player_order_to_json()['player_order']},to=id)
-                [server.socketio.emit('your_cards',player.cards_to_json(),to=player.sid) for player in game_list.games[id - 1].player_order if not player.name.startswith('BOT')]
-                return
+    player = game_list.games[id - 1].player_order[0]
+    if player.sid != request.sid:
+        server.socketio.emit(
+        'room_message', f'Não é sua vez de jogar', to=request.sid)    
+        return   
+       
+    card = Card(card_code)
+    result = game_list.games[id -1].throw_card(card,player.name)
+    if isinstance(result,HandResult):
+        server.socketio.emit('throwed_card',{'username' : player.name,'card':card.to_json()},to=id)
+        end_hand(result,id)
+        return
+    if isinstance(result,Player) or result == DRAW: 
+        server.socketio.emit('throwed_card', {'username' : player.name, 'card' : card.to_json()}, to=id)
+        server.socketio.emit('end_round',{'team':game_list.games[id -1].find_player_team(result).id if result != DRAW else DRAW,
+                                            'new_order':game_list.games[id -1].player_order_to_json()['player_order']},to=id)
+        [server.socketio.emit('your_cards',player.cards_to_json(),to=player.sid) for player in game_list.games[id - 1].player_order if not player.name.startswith('BOT')]
+        return
 
-            server.socketio.emit('throwed_card', {'username' : player.name, 'card' : card.to_json()}, to=id)
+    server.socketio.emit('throwed_card', {'username' : player.name, 'card' : card.to_json()}, to=id)
             
 
 @server.socketio.on('send message')
@@ -169,7 +172,7 @@ def response_truco(response:int,sid):
         return
     elif result == DECLINE:
         server.socketio.emit('declined_truco', {'username':player.name}, to=id)
-        end_hand(hand_result)
+        end_hand(hand_result,id)
         return
     server.socketio.emit('waiting_truco',{'username':player.name,'response':response},to=id)
 

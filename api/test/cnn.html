@@ -77,57 +77,65 @@ $(document).ready(function() {
     });
 
     $('#truco').on('click', function(){
+        console.log('truco')
         socket.emit('call_truco');
     })
 
     $('#acceptTruco').on('click', function(){
+        
         socket.emit('accept_truco');
     })
 
     $('#declineTruco').on('click', function(){
+        
         socket.emit('decline_truco')
     })
 
     socket.on('throwed_card',function(msg){
-        $("#messages").append('<li>'+msg+'</li>');
+        console.log('throwed_card')
         console.log(msg);
     })
 
     socket.on('connect_successfully', function(data){
+        console.log('connect')
         console.log(data)
     })
 
     socket.on('round_order', function(data){
+        console.log('round_order')
         console.log(data)
     })
 
     socket.on('end_hand', function(data){
+        console.log('fim de mão')
         console.log(data)
     })
 
     socket.on('end_round', function(data){
+        console.log('Fim de round')
         console.log(data)
     })
 
-  socket.on('accepted_truco', function(data){
+    socket.on('accepted_truco', function(data){
+        console.log('accept')
         console.log(data);
     })
 
     socket.on('receive_truco', function(data){
+        console.log('recieve')
         console.log(data);
     })
 
     socket.on('declined_truco', function(data){
+        console.log('decline')
         console.log(data);
     })
 
   socket.on('waiting_truco', function(data){
+        console.log('aguardando')
         console.log(data);
     })
    
-
-   
-
 });
 </script>
 
