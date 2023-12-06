@@ -23,10 +23,8 @@ export default function gameRoom() {
 	const [roundOrder] = useState(props.roundOrder)
 	const [hoveredIndex, setHoveredIndex] = useState<number | null>(null)
 	const [waitingAcceptTruco, setWaitingAcceptTruco] = useState(false)
-
-	console.log(player)
-
-	const TRICK_AUDIO = 7
+	const [trucoRequested, setTrucoRequested] = useState(false)
+	const [TRICK_AUDIO] = useState(7)
 
 	const toggleChat = () => {
 		const chat = document.querySelector("#chat")
@@ -46,8 +44,22 @@ export default function gameRoom() {
 		console.log("TRUCOOOOOOOOOO")
 	}
 
+	const acceptTruco = () => {
+		socket.emit("accept_truco")
+		setTrucoRequested(false)
+	}
+
+	const declineTruco = () => {
+		socket.emit("decline_truco")
+		setTrucoRequested(false)
+	}
+
+	const raiseTruco = () => {
+		socket.emit("call_truco")
+		setTrucoRequested(false)
+	}
+
 	const isMyTurn = () => {
-		roundOrder
 		return roundOrder.length > 0 && player.name === roundOrder[0]
 	}
 
@@ -56,16 +68,19 @@ export default function gameRoom() {
 			console.log("receive_truco", data)
 			playAudio(`sounds/truco-${Math.floor(Math.random() * TRICK_AUDIO)}.mp3`)
 			if (data.team == player.team) setWaitingAcceptTruco(true)
+			else setTrucoRequested(true)
 		})
 
 		socket.on("accepted_truco", (data) => {
 			console.log("accepted_truco", data)
 			if (waitingAcceptTruco) setWaitingAcceptTruco(false)
+			else setTrucoRequested(false)
 		})
 
 		socket.on("declined_truco", (data) => {
 			console.log("declined_truco", data)
 			if (waitingAcceptTruco) setWaitingAcceptTruco(false)
+			else setTrucoRequested(false)
 		})
 
 		return () => {
@@ -73,7 +88,7 @@ export default function gameRoom() {
 			socket.off("accepted_truco")
 			socket.off("declined_truco")
 		}
-	}, [])
+	}, [waitingAcceptTruco])
 
 	return (
 		<div className="min-h-screen bg-gradient-to-bl from-blue-700 via-blue-800 to-slate-700 text-white/90 md:grid md:grid-cols-5 md:content-normal md:gap-4 md:bg-white/90">
@@ -107,7 +122,7 @@ export default function gameRoom() {
 							<div className="row-span-2">
 								<div className="grid h-full grid-cols-3">
 									<div className="row-span-1 flex items-center justify-center">
-										<Dialog open={waitingAcceptTruco} onOpenChange={setWaitingAcceptTruco}>
+										<Dialog open={waitingAcceptTruco}>
 											<DialogTrigger asChild>
 												<button
 													id="trucoButton"
@@ -186,6 +201,28 @@ export default function gameRoom() {
 			>
 				<Icon>chat</Icon>
 			</button>
+			<Dialog open={trucoRequested}>
+				<DialogContent className="bg-slate-700 sm:max-w-[425px]">
+					<DialogHeader>
+						<DialogTitle className="text-slate-100">Truco</DialogTitle>
+						<DialogDescription></DialogDescription>
+					</DialogHeader>
+					<div className="grid gap-4 py-4">
+						<div className="text-center text-slate-300">O time adversário pediu truco!</div>
+						<div className="flex gap-4">
+							<button className="rounded-md bg-green-500 p-2 text-slate-100" onClick={acceptTruco}>
+								Aceitar
+							</button>
+							<button className="rounded-md bg-red-500 p-2 text-slate-100" onClick={declineTruco}>
+								Correr
+							</button>
+							<button className="rounded-md bg-orange-500 p-2 text-slate-100" onClick={raiseTruco}>
+								Aumentar
+							</button>
+						</div>
+					</div>
+				</DialogContent>
+			</Dialog>
 		</div>
 	)
 }

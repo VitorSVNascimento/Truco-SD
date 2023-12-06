@@ -138,14 +138,14 @@ export default function Home() {
 
 			const dataPlayers = data["players"]
 
-			const team1 = dataPlayers.at(0).map((player: string) => ({ name: player, team: "0" }))
+			const team1 = dataPlayers.at(0).map((player: string) => ({ name: player, team: "1" }))
 			while (team1.length < 2) {
-				team1.push({ name: "", team: "0" })
+				team1.push({ name: "", team: "1" })
 			}
 
-			const team2 = dataPlayers.at(1).map((player: string) => ({ name: player, team: "1" }))
+			const team2 = dataPlayers.at(1).map((player: string) => ({ name: player, team: "2" }))
 			while (team2.length < 2) {
-				team2.push({ name: "", team: "1" })
+				team2.push({ name: "", team: "2" })
 			}
 
 			navigate("/waitRoom", {
