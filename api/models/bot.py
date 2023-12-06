@@ -4,18 +4,18 @@ from models.card import Card
 from typing import List
 
 BOT_NAMES = [
-    "BOT Zé da Cerveja",
-    "BOT João do Samba",
-    "BOT Maria da Pinga",
-    "BOT Antônio do Petisco",
-    "BOT Carlinhos da Rocha",
-    "BOT Lúcia do Chopp",
-    "BOT Toninho do TiraGosto",
-    "BOT Linus Torvaldespacho do Samba",
-    "BOT Seu Jorge da Feijoada",
-    "BOT Mariana da Caipirinha",
-    "BOT Cleitin da Cachaça",
-    "BOT Piton Cachorro do Buteco"
+    "BOT Zé Da Cerveja",
+    "BOT João Do Samba",
+    "BOT Maria Da Pinga",
+    "BOT Antônio Do Petisco",
+    "BOT Carlinhos Da Rocha",
+    "BOT Lúcia Do Chopp",
+    "BOT Toninho Do TiraGosto",
+    "BOT Linus Torvaldespacho Do Samba",
+    "BOT Seu Jorge Da Feijoada",
+    "BOT Mariana Da Caipirinha",
+    "BOT Cleitin Da Cachaça",
+    "BOT Piton Cachorro Do Buteco"
 ]
 
 class Bot(Player):
