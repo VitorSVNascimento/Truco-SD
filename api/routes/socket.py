@@ -17,6 +17,9 @@ RM_TEAM_IS_FULL = 1
 RM_ROOM_IS_FULL = 2
 RM_ROOM_NOT_EXIST = 3
 
+TEN_HAND = 10
+TEN_HAND_VALUE = 4
+
 @server.socketio.on('connect')
 def test_connect():
     print('connection received')
@@ -161,7 +164,6 @@ def decline_truco():
     response_truco(DECLINE,request.sid)
 
 def response_truco(response:int,sid):
-    print('olaaa')
     id = game_list.sids[sid]
     player = game_list.games[id - 1].get_player_sid(sid)
     result,hand_result = game_list.games[id -1].truco_response(response, player)
@@ -179,4 +181,36 @@ def response_truco(response:int,sid):
 def end_hand(result:HandResult,id:int):
     server.socketio.emit('end_hand',{'new_order':game_list.games[id -1].player_order_to_json()['player_order'],
                                                  'game_score':game_list.games[id -1].get_score(),'overall_score':game_list.games[id -1].get_games_won(),'winner':result.team_winner.id},to=id)
-    [server.socketio.emit('your_cards',player.cards_to_json(),to=player.sid) for player in game_list.games[id - 1].player_order if not player.name.startswith('BOT')]
+    [server.socketio.emit('your_cards',player.cards_to_json(),to=player.sid) for player in game_list.games[id - 1].player_order if not player.name.startswith('BOT')]   
+    if result.team_winner.score == TEN_HAND and game_list.games[id - 1].team_opponent(result.team_winner).score != TEN_HAND:
+        if game_list.games[id -1].player_order.index(result.team_winner.players[0]) < game_list.games[id -1].player_order.index(result.team_winner.players[1]):
+            server.socketio.emit('ten_hand',{'partner_cards':result.team_winner.players[1].cards_to_json()['cards']},to=result.team_winner.players[0].sid) 
+        else:
+            server.socketio.emit('ten_hand',{'partner_cards':result.team_winner.players[0].cards_to_json()['cards']},to=result.team_winner.players[1].sid) 
+
+@server.socketio.on('accept_ten_hand')
+def accept_ten_hand():
+    id = game_list.sids[request.sid]
+    if  TEN_HAND not in game_list.games[id - 1].get_games_won():
+        server.socketio.emit(
+        'room_message', f'Não está na mão de 10', to=request.sid)    
+        return
+    
+    game_list.games[id - 1].current_hand.hand_value = TEN_HAND_VALUE
+    player = game_list.games[id - 1].get_player_sid(request.sid)
+    server.socketio.emit('accepted_ten_hand',{'username':player.name},to=id)
+    pass
+
+@server.socketio.on('decline_ten_hand')
+def decline_ten_hand():
+    id = game_list.sids[request.sid]
+    if  TEN_HAND not in game_list.games[id - 1].get_games_won():
+        server.socketio.emit(
+        'room_message', f'Não está na mão de 10', to=request.sid)    
+        return
+    player = game_list.games[id - 1].get_player_sid(request.sid)
+    hand_result = game_list.games[id - 1].decline_ten_hand(player)
+    end_hand(hand_result,id)
+    server.socketio.emit('declined_ten_hand',{'username':player.name},to=id)
+    pass
+

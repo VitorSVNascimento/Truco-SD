@@ -101,3 +101,10 @@ class Team:
             if player.name == username:
                 return player
         return None
+    
+    def get_partner(self,player:Player):
+        player.cards_to_json
+        for partner in self.players:
+            if player.name != partner.name:
+                return partner
+        return
