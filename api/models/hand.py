@@ -54,14 +54,14 @@ class Hand:
                 return hand_result
 
 
+        
             result = [value for value in self.hand_winners if value != DRAW]
             hand_result = HandResult(result[0],self.hand_value,self.table_cards[0][1]['player'])
             self.clear_table()
             return hand_result
-
+        print(f'Tamanho da bagunça = {len(self.hand_winners)}, lista == {[team.id for team in self.hand_winners]}')
         if len(self.hand_winners) == 2 and self.hand_winners[0] != self.hand_winners[1]:
             print('if do time diferente')
-            self.clear_table()
             return HandResult(None,NOT_END,None)
         
         if len(self.hand_winners) == 2 and self.hand_winners[0] == self.hand_winners[1]:
@@ -72,6 +72,7 @@ class Hand:
         print('max value')
         winner =  max(set(self.hand_winners), key=self.hand_winners.count)
         hand_result = HandResult(winner,self.hand_value,self.table_cards[0][1]['player'])
+        self.clear_table()
         return hand_result
 
     def __get_wight(self,card_on_board):
@@ -107,7 +108,7 @@ class Hand:
     def next_round(self):
         self.round+=1
     
-    def get_current_team_winner(self,):
+    def get_current_team_winner(self):
         return self.hand_winners[-1]
 
     def clear_table(self):

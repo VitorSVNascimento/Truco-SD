@@ -213,7 +213,7 @@ class Game:
             self.__define_player_order_by_last_winner(winner.name)
             print('----------------New Round------------------')
             [print(f'{player.name} = {[card.code for card in player.cards]}') for player in self.player_order]
-            team_winner = self.current_hand.get_current_round_winner()
+            team_winner = self.current_hand.get_current_team_winner()
             self.current_hand.next_round()
             if team_winner == DRAW:
                 return team_winner
