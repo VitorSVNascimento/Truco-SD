@@ -141,7 +141,38 @@ export default function gameRoom() {
 											<GameRoomPlayer playerName={tableOrder[PLAYER_POSITION_LEFT].name} cardsNumber={tableOrder[PLAYER_POSITION_LEFT].cardsCount} />
 										)}
 									</div>
-									<div className="col-span-4 rounded-full border-4 border-orange-400 bg-green-500"></div>
+									<div className="col-span-4 rounded-full border-4 border-orange-400 bg-green-500 grid h-full grid-rows-3">
+										<div className="row-span-1 flex items-center justify-center">
+											<img
+												className="m-1 w-9 p-0 md:w-20"
+												src="1-cards.svg"
+												alt={`Cartas do jogador ${props.playerName}.`}
+											/>
+										</div>
+										<div className="row-span-1 grid h-full grid-cols-2">
+											<div className="col-span-1 flex items-center justify-center">
+												<img
+													className="m-1 w-9 p-0 md:w-20"
+													src="1-cards.svg"
+													alt={`Cartas do jogador ${props.playerName}.`}
+												/>
+											</div>
+											<div className="col-span-1 flex items-center justify-center">
+												<img
+													className="m-1 w-9 p-0 md:w-20"
+													src="1-cards.svg"
+													alt={`Cartas do jogador ${props.playerName}.`}
+												/>
+											</div>
+										</div>
+										<div className="row-span-1 flex items-center justify-center">
+											<img
+												className="m-1 w-9 p-0 md:w-20"
+												src="1-cards.svg"
+												alt={`Cartas do jogador ${props.playerName}.`}
+											/>
+										</div>
+									</div>
 									<div className="col-span-2 flex items-center justify-center">
 										{tableOrder.length > PLAYER_POSITION_RIGHT && (
 											<GameRoomPlayer playerName={tableOrder[PLAYER_POSITION_RIGHT].name} cardsNumber={tableOrder[PLAYER_POSITION_RIGHT].cardsCount} />
