@@ -13,6 +13,8 @@ CARDS_PER_PLAYER = 3
 PLAYERS_AMOUNT = 4
 FIRST_PLAYER = 0
 
+FINAL_RESULT = 12
+
 SUCCESS = 200
 END_HAND = 201
 END_ROUND = 202
@@ -248,6 +250,9 @@ class Game:
     
     def get_score(self,):
         return [self.teams[TEAM_ONE -1].score,self.teams[TEAM_TWO -1].score]
+    
+    def get_games_won(self,):
+        return [self.teams[TEAM_ONE -1].games_won,self.teams[TEAM_TWO -1].games_won]
 
     def team_opponent(self,team:Team):
         return self.teams[1] if team.id == TEAM_ONE else self.teams[0]
@@ -278,7 +283,13 @@ class Game:
         return response,hand_result
 
     def end_hand(self,hand_result:HandResult) -> HandResult:
-        self.teams[self.teams.index(hand_result.team_winner)].increment_score(hand_result.hand_value)
+        team = self.teams[self.teams.index(hand_result.team_winner)]
+        team.increment_score(hand_result.hand_value)
+        if team.score >= FINAL_RESULT:
+            # Ganhou o jogo
+            team.games_won +=1
+            team.score = 0
+            self.team_opponent(team).score = 0
         self.__define_player_order_by_last_winner(hand_result.next_player.name)
         [player.cards.clear() for player in self.player_order]
         self.__create_players_piles(self.deck['deck_id'], self.player_order)

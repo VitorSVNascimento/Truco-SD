@@ -175,5 +175,5 @@ def response_truco(response:int,sid):
 
 def end_hand(result:HandResult,id:int):
     server.socketio.emit('end_hand',{'new_order':game_list.games[id -1].player_order_to_json()['player_order'],
-                                                 'score':game_list.games[id -1].get_score(),'winner':result.team_winner.id},to=id)
+                                                 'game_score':game_list.games[id -1].get_score(),'overall_score':game_list.games[id -1].get_games_won(),'winner':result.team_winner.id},to=id)
     [server.socketio.emit('your_cards',player.cards_to_json(),to=player.sid) for player in game_list.games[id - 1].player_order if not player.name.startswith('BOT')]
