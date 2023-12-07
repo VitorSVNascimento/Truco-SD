@@ -140,6 +140,7 @@ export default function gameRoom() {
 
 			setTableOrder(updatedTableOrder)
 			setTurn(turn + 1)
+			playAudio(`sounds/${Math.floor(Math.random() * 2)}-flip.mp3`)
 		})
 
 		socket.on("end_round", (data) => {
@@ -188,10 +189,10 @@ export default function gameRoom() {
 											/>
 										)}
 									</div>
-									<div className="col-span-4 grid h-full grid-rows-3 rounded-full border-4 border-orange-400 bg-green-500">
-										<div className="row-span-1 flex items-center justify-center">
-											{/* TOP */}
-											{tableOrder.length > PLAYER_POSITION_TOP && (
+									<div className="col-span-4 grid h-full grid-cols-3 rounded-full border-4 border-orange-400 bg-green-500">
+										<div className="col-span-1 flex items-center justify-center">
+											{/* LEFT */}
+											{tableOrder.length > PLAYER_POSITION_LEFT && (
 												<img
 													className="m-1 p-0 w-9 md:w-14 2xl:w-20"
 													src={tableOrder[PLAYER_POSITION_LEFT].lastThrowedCardImg}
@@ -199,7 +200,7 @@ export default function gameRoom() {
 											)}
 										</div>
 										<div className="col-span-1 grid h-full grid-rows-2">
-											<div className="rpw-span-1 flex items-center justify-center">
+											<div className="col-span-1 flex items-center justify-center">
 												{/* TOP */}
 												{tableOrder.length > PLAYER_POSITION_TOP && (
 													<img
@@ -208,12 +209,12 @@ export default function gameRoom() {
 													/>
 												)}
 											</div>
-											<div className="rpw-span-1 flex items-center justify-center">
+											<div className="col-span-1 flex items-center justify-center">
 												{/* BOTTOM */}
 												{tableOrder.length > PLAYER_POSITION_BOTTOM && (
 													<img
 														className="m-1 w-9 p-0 md:w-20"
-														src={tableOrder[PLAYER_POSITION_RIGHT].lastThrowedCardImg}
+														src={tableOrder[PLAYER_POSITION_BOTTOM].lastThrowedCardImg}
 													/>
 												)}
 											</div>
