@@ -17,7 +17,7 @@ import GameRoomPlayer from "../components/gameRoom/GameRoomPlayer"
 export default function gameRoom() {
 	const location = useLocation()
 	const { props } = location.state || {}
-	const [cards, setCards] = useState(props.cards)
+	const [cards, setCards] = useState(props?.cards)
 	const [player] = useState(props?.player)
 	// const [ players ] = useState(props?.players)
 	const [roundOrder] = useState(props?.roundOrder)
@@ -27,12 +27,14 @@ export default function gameRoom() {
 	const [CARD_PATTERN] = useState("card-pattern.svg")
 	const [tableOrder, setTableOrder] = useState<any[]>([])
 	const [turn, setTurn] = useState<number>(0)
-	const [myTurn, setMyTurn] = useState(roundOrder.length > 0 && player.name === roundOrder[turn])
+	const [myTurn, setMyTurn] = useState(roundOrder?.length > 0 && player?.name === roundOrder[turn])
 	const [TRICK_AUDIO] = useState(7)
 	const [PLAYER_POSITION_BOTTOM] = useState(0)
 	const [PLAYER_POSITION_RIGHT] = useState(1)
 	const [PLAYER_POSITION_TOP] = useState(2)
 	const [PLAYER_POSITION_LEFT] = useState(3)
+	const [handValue, setHandValue] = useState(2)
+	const [proposedHandValue, setProposedHandValue] = useState(2)
 
 	const toggleChat = () => {
 		const chat = document.querySelector("#chat")
@@ -90,11 +92,15 @@ export default function gameRoom() {
 			console.log("receive_truco", data)
 			playAudio(`sounds/truco-${Math.floor(Math.random() * TRICK_AUDIO)}.mp3`)
 			if (data.team == player.team) setWaitingAcceptTruco(true)
-			else setTrucoRequested(true)
+			else {
+				setTrucoRequested(true)
+				setProposedHandValue(data["proposed_value"])
+			}
 		})
 
 		socket.on("accepted_truco", (data) => {
 			console.log("accepted_truco", data)
+			setHandValue(data["new_hand_value"])
 			if (waitingAcceptTruco) setWaitingAcceptTruco(false)
 			else setTrucoRequested(false)
 		})
@@ -103,7 +109,7 @@ export default function gameRoom() {
 			console.log("declined_truco", data)
 			if (waitingAcceptTruco) setWaitingAcceptTruco(false)
 			else setTrucoRequested(false)
-		})		
+		})
 
 		socket.on("your_cards", (cards: any) => {
 			console.log("your_cards", cards)
@@ -117,21 +123,21 @@ export default function gameRoom() {
 			socket.off("throwed_card")
 			socket.off("your_cards")
 		}
-	}, [waitingAcceptTruco])
+	}, [waitingAcceptTruco, handValue])
 
 	useEffect(() => {
 		socket.on("throwed_card", (data) => {
-			const updatedTableOrder = tableOrder.map((player) => {
-			  if (player.name === data.username) {
-				return {
-				  ...player,
-				  cardsCount: player.cardsCount - 1,
-				  lastThrowedCardImg:  data.card.url_image,
+			const updatedTableOrder = tableOrder?.map((player) => {
+				if (player.name === data.username) {
+					return {
+						...player,
+						cardsCount: player.cardsCount - 1,
+						lastThrowedCardImg: data.card.url_image,
+					}
 				}
-			  }
-			  return player
+				return player
 			})
-	  
+
 			setTableOrder(updatedTableOrder)
 			setTurn(turn + 1)
 		})
@@ -177,7 +183,7 @@ export default function gameRoom() {
 											/>
 										)}
 									</div>
-									<div className="col-span-4 rounded-full border-4 border-orange-400 bg-green-500 grid h-full grid-rows-3">
+									<div className="col-span-4 grid h-full grid-rows-3 rounded-full border-4 border-orange-400 bg-green-500">
 										<div className="row-span-1 flex items-center justify-center">
 											{/* TOP */}
 											{tableOrder.length > PLAYER_POSITION_TOP && (
@@ -203,7 +209,7 @@ export default function gameRoom() {
 													<img
 														className="m-1 w-9 p-0 md:w-20"
 														src={tableOrder[PLAYER_POSITION_RIGHT].lastThrowedCardImg}
-													/>	
+													/>
 												)}
 											</div>
 										</div>
@@ -255,7 +261,7 @@ export default function gameRoom() {
 										</Dialog>
 									</div>
 									<div className="row-span-1 flex items-center justify-center">
-										{cards.map(
+										{cards?.map(
 											(c: { code: null | undefined; url_image: string }, index: number) => (
 												<button
 													className={`m-1 w-14 md:w-28 ${
@@ -281,7 +287,7 @@ export default function gameRoom() {
 									<div className="row-span-1 flex items-center justify-center gap-2">
 										<div className="grid grid-rows-2">
 											<div className="row-span-1 font-mono text-2xl font-semibold capitalize antialiased md:text-4xl">
-												{player.name}
+												{player?.name}
 											</div>
 											{myTurn && (
 												<div className="text-1xl row-span-1 font-mono font-semibold antialiased md:text-2xl">
@@ -317,7 +323,21 @@ export default function gameRoom() {
 						<DialogDescription></DialogDescription>
 					</DialogHeader>
 					<div className="grid gap-4 py-4">
-						<div className="text-center text-slate-300">O time adversário pediu truco!</div>
+						<div className="text-slate-300">
+							O time adversário pediu
+							{(() => {
+								switch (proposedHandValue) {
+									case 4:
+										return " truco"
+									case 8:
+										return " 6"
+									case 10:
+										return " 9"
+									case 12:
+										return " 12"
+								}
+							})()}
+						</div>
 						<div className="flex gap-4">
 							<button className="rounded-md bg-green-500 p-2 text-slate-100" onClick={acceptTruco}>
 								Aceitar
@@ -325,9 +345,23 @@ export default function gameRoom() {
 							<button className="rounded-md bg-red-500 p-2 text-slate-100" onClick={declineTruco}>
 								Correr
 							</button>
-							<button className="rounded-md bg-orange-500 p-2 text-slate-100" onClick={raiseTruco}>
-								Aumentar
-							</button>
+							{proposedHandValue <= 10 && (
+								<button
+									className="rounded-md bg-orange-500 p-2 text-slate-100"
+									onClick={raiseTruco}
+								>
+									{(() => {
+										switch (proposedHandValue) {
+											case 4:
+												return "Pedir 6"
+											case 8:
+												return "Pedir 9"
+											case 10:
+												return "Pedir 12"
+										}
+									})()}
+								</button>
+							)}
 						</div>
 					</div>
 				</DialogContent>
