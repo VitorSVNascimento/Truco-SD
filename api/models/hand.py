@@ -134,7 +134,7 @@ class Hand:
             return WAITING
         if len(self.truco_responses) == 1:
             return ACCEPT
-        if self.truco_responses[0]['response'] == ACCEPT and self.truco_responses[1]['response'] == ACCEPT:
+        if self.truco_responses[0]['response'] == ACCEPT or self.truco_responses[1]['response'] == ACCEPT:
             self.truco_responses = []
             return ACCEPT
         self.truco_responses = []
