@@ -24,11 +24,14 @@ export default function gameRoom() {
 	const [hoveredIndex, setHoveredIndex] = useState<number | null>(null)
 	const [waitingAcceptTruco, setWaitingAcceptTruco] = useState(false)
 	const [trucoRequested, setTrucoRequested] = useState(false)
+	const [CARD_PATTERN] = useState("card-pattern.svg")
 	const [tableOrder, setTableOrder] = useState<any[]>([])
-	const [myTurn] = useState(roundOrder.length > 0 && player.name === roundOrder[0])
+	const [turn, setTurn] = useState<number>(0)
+	const [myTurn, setMyTurn] = useState(roundOrder.length > 0 && player.name === roundOrder[turn])
 	const [TRICK_AUDIO] = useState(7)
-	const [PLAYER_POSITION_TOP] = useState(2)
+	const [PLAYER_POSITION_BOTTOM] = useState(0)
 	const [PLAYER_POSITION_RIGHT] = useState(1)
+	const [PLAYER_POSITION_TOP] = useState(2)
 	const [PLAYER_POSITION_LEFT] = useState(3)
 
 	const toggleChat = () => {
@@ -42,7 +45,7 @@ export default function gameRoom() {
 		setCards(cards.filter((card: { code: string }) => card.code != code))
 		// eslint-disable-next-line camelcase
 		socket.emit("throw_card", { card_code: code })
-		console.log("Cartas", cards)
+		// console.log("Cartas", cards)
 	}
 
 	const callTruco = () => {
@@ -66,14 +69,13 @@ export default function gameRoom() {
 	}
 
 	const reorganizeTableOrder = () => {
-		const playerIndex = roundOrder.indexOf(player.name)
-
 		const newArray = roundOrder
-			.slice(playerIndex)
-			.concat(roundOrder.slice(0, playerIndex))
+			.slice(roundOrder.indexOf(player.name))
+			.concat(roundOrder.slice(0, roundOrder.indexOf(player.name)))
 			.map((playerName: string) => ({
 				name: playerName,
 				cardsCount: 3,
+				lastThrowedCardImg: CARD_PATTERN,
 			}))
 
 		setTableOrder(newArray)
@@ -101,11 +103,7 @@ export default function gameRoom() {
 			console.log("declined_truco", data)
 			if (waitingAcceptTruco) setWaitingAcceptTruco(false)
 			else setTrucoRequested(false)
-		})
-
-		socket.on("throwed_card", (data) => {
-			console.log("throwed_card", data)
-		})
+		})		
 
 		socket.on("your_cards", (cards: any) => {
 			console.log("your_cards", cards)
@@ -120,6 +118,32 @@ export default function gameRoom() {
 			socket.off("your_cards")
 		}
 	}, [waitingAcceptTruco])
+
+	useEffect(() => {
+		socket.on("throwed_card", (data) => {
+			const updatedTableOrder = tableOrder.map((player) => {
+			  if (player.name === data.username) {
+				return {
+				  ...player,
+				  cardsCount: player.cardsCount - 1,
+				  lastThrowedCardImg:  data.card.url_image,
+				}
+			  }
+			  return player
+			})
+	  
+			setTableOrder(updatedTableOrder)
+			setTurn(turn + 1)
+		})
+
+		return () => {
+			socket.off("throwed_card")
+		}
+	}, [cards, tableOrder])
+
+	useEffect(() => {
+		setMyTurn(roundOrder.length > 0 && player.name === roundOrder[turn])
+	}, [turn])
 
 	return (
 		<div className="min-h-screen bg-gradient-to-bl from-blue-700 via-blue-800 to-slate-700 text-white/90 md:grid md:grid-cols-5 md:content-normal md:gap-4 md:bg-white/90">
@@ -155,34 +179,42 @@ export default function gameRoom() {
 									</div>
 									<div className="col-span-4 rounded-full border-4 border-orange-400 bg-green-500 grid h-full grid-rows-3">
 										<div className="row-span-1 flex items-center justify-center">
-											<img
-												className="m-1 w-9 p-0 md:w-20"
-												src="1-cards.svg"
-												alt={`Cartas do jogador ${props.playerName}.`}
-											/>
+											{/* TOP */}
+											{tableOrder.length > PLAYER_POSITION_TOP && (
+												<img
+													className="m-1 w-9 p-0 md:w-20"
+													src={tableOrder[PLAYER_POSITION_TOP].lastThrowedCardImg}
+												/>
+											)}
 										</div>
 										<div className="row-span-1 grid h-full grid-cols-2">
 											<div className="col-span-1 flex items-center justify-center">
-												<img
-													className="m-1 w-9 p-0 md:w-20"
-													src="1-cards.svg"
-													alt={`Cartas do jogador ${props.playerName}.`}
-												/>
+												{/* LEFT */}
+												{tableOrder.length > PLAYER_POSITION_LEFT && (
+													<img
+														className="m-1 w-9 p-0 md:w-20"
+														src={tableOrder[PLAYER_POSITION_LEFT].lastThrowedCardImg}
+													/>
+												)}
 											</div>
 											<div className="col-span-1 flex items-center justify-center">
-												<img
-													className="m-1 w-9 p-0 md:w-20"
-													src="1-cards.svg"
-													alt={`Cartas do jogador ${props.playerName}.`}
-												/>
+												{/* RIGHT */}
+												{tableOrder.length > PLAYER_POSITION_RIGHT && (
+													<img
+														className="m-1 w-9 p-0 md:w-20"
+														src={tableOrder[PLAYER_POSITION_RIGHT].lastThrowedCardImg}
+													/>	
+												)}
 											</div>
 										</div>
 										<div className="row-span-1 flex items-center justify-center">
-											<img
-												className="m-1 w-9 p-0 md:w-20"
-												src="1-cards.svg"
-												alt={`Cartas do jogador ${props.playerName}.`}
-											/>
+											{/* BOTTOM */}
+											{tableOrder.length > PLAYER_POSITION_BOTTOM && (
+												<img
+													className="m-1 w-9 p-0 md:w-20"
+													src={tableOrder[PLAYER_POSITION_BOTTOM].lastThrowedCardImg}
+												/>
+											)}
 										</div>
 									</div>
 									<div className="col-span-2 flex items-center justify-center">
