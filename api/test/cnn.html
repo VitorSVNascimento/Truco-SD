@@ -31,6 +31,12 @@
     <button id="truco">Truco</button>
     <button id="acceptTruco">Acept</button>
     <button id="declineTruco">Decline</button>
+
+    <div>
+        <h4>Mão de 10</h4>
+        <button id="accept_ten_hand">Jogar</button>
+        <button id="decline_ten_hand">Correr</button>
+    </div>
     
 <script type="text/javascript">
 $(document).ready(function() {
@@ -82,13 +88,17 @@ $(document).ready(function() {
     })
 
     $('#acceptTruco').on('click', function(){
-        
         socket.emit('accept_truco');
     })
 
     $('#declineTruco').on('click', function(){
-        
         socket.emit('decline_truco')
+    })
+    $('#accept_ten_hand').on('click', function(){
+        socket.emit('accept_ten_hand')
+    })
+    $('#decline_ten_hand').on('click', function(){
+        socket.emit('decline_ten_hand')
     })
 
     socket.on('throwed_card',function(msg){
@@ -136,13 +146,18 @@ $(document).ready(function() {
         console.log(data);
     })
 
-    socket.on('waiting_truco', function(data){
-        console.log('aguardando')
+    socket.on('ten_hand', function(data){
+        console.log('Mão de 10')
         console.log(data);
     })
     
-    socket.on('waiting_truco', function(data){
-        console.log('aguardando')
+    socket.on('accepted_ten_hand', function(data){
+        console.log('Mão de 10 aceita')
+        console.log(data);
+    })
+
+    socket.on('declined_ten_hand', function(data){
+        console.log('Mão de 10 recusada')
         console.log(data);
     })
    

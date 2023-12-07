@@ -6,6 +6,8 @@ from models.hand_resullt import HandResult
 
 ''' Valor base (tentos) de uma mão '''
 BASE_HAND_VALUE = 2
+SIX_CALL = 8
+TEN_HAND = 10
 
 ''' Valor máximo (tentos) de uma mão '''
 MAX_HAND_VALUE = 12
@@ -139,6 +141,9 @@ class Hand:
         return DECLINE
     
     def buff_hand_value(self,):
+        if self.hand_value == SIX_CALL:
+            self.hand_value = TEN_HAND
+            return
         self.hand_value+=2 if self.hand_value%4 != 0 else 4
 
  
