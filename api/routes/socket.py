@@ -182,12 +182,8 @@ def end_hand(result:HandResult,id:int):
     server.socketio.emit('end_hand',{'new_order':game_list.games[id -1].player_order_to_json()['player_order'],
                                                  'game_score':game_list.games[id -1].get_score(),'overall_score':game_list.games[id -1].get_games_won(),'winner':result.team_winner.id},to=id)
     [server.socketio.emit('your_cards',player.cards_to_json(),to=player.sid) for player in game_list.games[id - 1].player_order if not player.name.startswith('BOT')]   
-    if result.team_winner.score == TEN_HAND and game_list.games[id - 1].team_opponent(result.team_winner).score != TEN_HAND:
-        print('entrou aqui')
-        if game_list.games[id -1].player_order.index(result.team_winner.players[0]) < game_list.games[id -1].player_order.index(result.team_winner.players[1]):
-            server.socketio.emit('ten_hand',{'partner_cards':result.team_winner.players[1].cards_to_json()['cards']},to=result.team_winner.players[0].sid) 
-        else:
-            server.socketio.emit('ten_hand',{'partner_cards':result.team_winner.players[0].cards_to_json()['cards']},to=result.team_winner.players[1].sid) 
+    check_ten_hand(id)
+   
 
 @server.socketio.on('accept_ten_hand')
 def accept_ten_hand():
@@ -215,7 +211,22 @@ def decline_ten_hand():
     print('decline')
     player = game_list.games[id - 1].get_player_sid(request.sid)
     hand_result = game_list.games[id - 1].decline_ten_hand(player)
-    end_hand(hand_result,id)
     server.socketio.emit('declined_ten_hand',{'username':player.name},to=id)
+    end_hand(hand_result,id)
     pass
+
+def check_ten_hand(id:int):
+    game = game_list.games[id - 1]
+    print('aou potencia')
+    print(game.get_score)
+    print(game.get_score().count(TEN_HAND))
+    if TEN_HAND not in game.get_score() or game.get_score().count(TEN_HAND) == 2:
+        print('TA NO IF')
+        return
+    team_on_ten_hand =  game.teams[game.get_score().index(TEN_HAND)] 
+    print('entrou NO TEN HAND')
+    if game_list.games[id -1].player_order.index(team_on_ten_hand.players[0]) < game_list.games[id -1].player_order.index(team_on_ten_hand.players[1]):
+        server.socketio.emit('ten_hand',{'partner_cards':team_on_ten_hand.players[1].cards_to_json()['cards']},to=team_on_ten_hand.players[0].sid) 
+    else:
+        server.socketio.emit('ten_hand',{'partner_cards':team_on_ten_hand.players[0].cards_to_json()['cards']},to=team_on_ten_hand.players[1].sid) 
 
