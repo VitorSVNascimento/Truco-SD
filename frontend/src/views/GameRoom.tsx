@@ -20,7 +20,7 @@ export default function gameRoom() {
 	const [cards, setCards] = useState(props?.cards)
 	const [player] = useState(props?.player)
 	// const [ players ] = useState(props?.players)
-	const [roundOrder] = useState(props?.roundOrder)
+	const [roundOrder, setRoundOrder] = useState(props?.roundOrder)
 	const [hoveredIndex, setHoveredIndex] = useState<number | null>(null)
 	const [waitingAcceptTruco, setWaitingAcceptTruco] = useState(false)
 	const [trucoRequested, setTrucoRequested] = useState(false)
@@ -47,7 +47,6 @@ export default function gameRoom() {
 		setCards(cards.filter((card: { code: string }) => card.code != code))
 		// eslint-disable-next-line camelcase
 		socket.emit("throw_card", { card_code: code })
-		// console.log("Cartas", cards)
 	}
 
 	const callTruco = () => {
@@ -81,6 +80,19 @@ export default function gameRoom() {
 			}))
 
 		setTableOrder(newArray)
+	}
+
+	const updateTableOrder = (newData: any) => {
+		return tableOrder?.map((player) => {
+			if (player.name === newData.username) {
+				return {
+					...player,
+					cardsCount: player.cardsCount - 1,
+					lastThrowedCardImg: newData.card.url_image,
+				}
+			}
+			return player
+		})
 	}
 
 	useEffect(() => {
@@ -127,24 +139,21 @@ export default function gameRoom() {
 
 	useEffect(() => {
 		socket.on("throwed_card", (data) => {
-			const updatedTableOrder = tableOrder?.map((player) => {
-				if (player.name === data.username) {
-					return {
-						...player,
-						cardsCount: player.cardsCount - 1,
-						lastThrowedCardImg: data.card.url_image,
-					}
-				}
-				return player
-			})
-
-			setTableOrder(updatedTableOrder)
+			setTableOrder(updateTableOrder(data))
 			setTurn(turn + 1)
 			playAudio(`sounds/${Math.floor(Math.random() * 2)}-flip.mp3`)
 		})
 
 		socket.on("end_round", (data) => {
 			console.log("end_round", data)
+			// eslint-disable-next-line camelcase
+			setRoundOrder(data.new_order)
+			reorganizeTableOrder()
+			setTurn(0)
+		})
+		
+		socket.on("end_hand", (data) => {
+			console.log("end_hand", data)
 		})
 
 		return () => {
@@ -276,7 +285,7 @@ export default function gameRoom() {
 														!myTurn
 															? "opacity-80 grayscale"
 															: hoveredIndex !== null && hoveredIndex !== index
-															? "blur-sm grayscale"
+															? "md:blur-sm md:grayscale"
 															: ""
 													}`}
 													key={c.code}
