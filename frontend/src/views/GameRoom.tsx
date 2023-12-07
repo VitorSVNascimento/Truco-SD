@@ -28,7 +28,7 @@ export default function gameRoom() {
 	const [tableOrder, setTableOrder] = useState<any[]>([])
 	const [turn, setTurn] = useState<number>(0)
 	const [myTurn, setMyTurn] = useState(roundOrder?.length > 0 && player?.name === roundOrder[turn])
-	const [TRICK_AUDIO] = useState(7)
+	const [TRICK_AUDIO] = useState(8)
 	const [PLAYER_POSITION_BOTTOM] = useState(0)
 	const [PLAYER_POSITION_RIGHT] = useState(1)
 	const [PLAYER_POSITION_TOP] = useState(2)
