@@ -3,7 +3,7 @@
 ## Proposta do Projeto
  Projeto de turma desenvolvido para a disciplina de Sistemas Distribuídos, lecionada pelo professor Rafael.
  <br>
- O projeto consiste em:
+ - O projeto consiste em:
    
    | | ÁREA | DESCRIÇÃO | |
    | --- | --- | --- | --- |
