@@ -327,7 +327,7 @@ export default function gameRoom() {
 									</div>
 									<div className="row-span-1 flex items-center justify-center gap-2">
 										<div className="grid grid-rows-2">
-											<div className="row-span-1 font-mono text-2xl font-semibold capitalize antialiased md:text-4xl">
+											<div className="row-span-1 truncate font-mono text-2xl font-semibold capitalize antialiased md:text-4xl">
 												{player?.name}
 											</div>
 											{myTurn && (

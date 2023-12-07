@@ -10,7 +10,7 @@ export default function GameRoomPlayer(props: { playerName: string; cardsNumber:
 					<div className="flex items-center justify-center">
 						<Icon>person</Icon>
 					</div>
-					<div className="font-mono text-1xl text-center font-semibold antialiased md:text-2xl overflow-hidden overflow-wrap break-word">
+					<div className="text-1xl w-10 truncate text-center font-mono font-semibold antialiased sm:w-20 md:w-32 md:text-2xl lg:w-36">
 						{props.playerName}
 					</div>
 				</div>
