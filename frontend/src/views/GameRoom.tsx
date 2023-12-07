@@ -7,10 +7,10 @@ import { socket } from "../socket"
 import {
 	Dialog,
 	DialogContent,
-	DialogDescription,
 	DialogHeader,
 	DialogTitle,
 	DialogTrigger,
+	DialogClose,
 } from "@/components/ui/dialog"
 import GameRoomPlayer from "../components/gameRoom/GameRoomPlayer"
 
@@ -19,10 +19,12 @@ export default function gameRoom() {
 	const { props } = location.state || {}
 	const [cards, setCards] = useState(props?.cards)
 	const [player] = useState(props?.player)
-	// const [ players ] = useState(props?.players)
+	const [players] = useState(props?.players)
 	const [roundOrder] = useState(props?.roundOrder)
 	const [hoveredIndex, setHoveredIndex] = useState<number | null>(null)
 	const [waitingAcceptTruco, setWaitingAcceptTruco] = useState(false)
+	const [waitingPartnerTruco, setWaitingPartnerTruco] = useState(false)
+	const [partnerTrucoResponse, setPartnerTrucoResponse] = useState(0)
 	const [trucoRequested, setTrucoRequested] = useState(false)
 	const [CARD_PATTERN] = useState("card-pattern.svg")
 	const [tableOrder, setTableOrder] = useState<any[]>([])
@@ -35,6 +37,8 @@ export default function gameRoom() {
 	const [PLAYER_POSITION_LEFT] = useState(3)
 	const [handValue, setHandValue] = useState(2)
 	const [proposedHandValue, setProposedHandValue] = useState(2)
+	const [showModalEndHand, setShowModalEndHand] = useState(false)
+	const [isHandWinner, setIsHandWinner] = useState(false)
 
 	const toggleChat = () => {
 		const chat = document.querySelector("#chat")
@@ -62,7 +66,6 @@ export default function gameRoom() {
 
 	const declineTruco = () => {
 		socket.emit("decline_truco")
-		setTrucoRequested(false)
 	}
 
 	const raiseTruco = () => {
@@ -91,6 +94,7 @@ export default function gameRoom() {
 		socket.on("receive_truco", (data: any) => {
 			console.log("receive_truco", data)
 			playAudio(`sounds/truco-${Math.floor(Math.random() * TRICK_AUDIO)}.mp3`)
+			setPartnerTrucoResponse(0)
 			if (data.team == player.team) setWaitingAcceptTruco(true)
 			else {
 				setTrucoRequested(true)
@@ -109,11 +113,33 @@ export default function gameRoom() {
 			console.log("declined_truco", data)
 			if (waitingAcceptTruco) setWaitingAcceptTruco(false)
 			else setTrucoRequested(false)
+			setWaitingPartnerTruco(false)
 		})
 
 		socket.on("your_cards", (cards: any) => {
 			console.log("your_cards", cards)
 			// setCards(cards)
+		})
+
+		socket.on("end_hand", (data) => {
+			console.log("end_hand", data)
+			if (data["winner"] == player.team) setIsHandWinner(true)
+			else setIsHandWinner(false)
+			setShowModalEndHand(true)
+			setWaitingPartnerTruco(false)
+		})
+
+		socket.on("waiting_truco", (data) => {
+			console.log("waiting_truco", data)
+			if (data["username"] === player.name) {
+				setWaitingPartnerTruco(true)
+			} else {
+				const dataPlayer = players.find((el: any) => el.name === data["username"])
+
+				if (dataPlayer?.team == player.team) {
+					setPartnerTrucoResponse(data["response"])
+				}
+			}
 		})
 
 		return () => {
@@ -122,6 +148,7 @@ export default function gameRoom() {
 			socket.off("declined_truco")
 			socket.off("throwed_card")
 			socket.off("your_cards")
+			socket.off("end_hand")
 		}
 	}, [waitingAcceptTruco, handValue])
 
@@ -194,7 +221,7 @@ export default function gameRoom() {
 											{/* LEFT */}
 											{tableOrder.length > PLAYER_POSITION_LEFT && (
 												<img
-													className="m-1 p-0 w-9 md:w-14 2xl:w-20"
+													className="m-1 w-9 p-0 md:w-14 2xl:w-20"
 													src={tableOrder[PLAYER_POSITION_LEFT].lastThrowedCardImg}
 												/>
 											)}
@@ -204,7 +231,7 @@ export default function gameRoom() {
 												{/* TOP */}
 												{tableOrder.length > PLAYER_POSITION_TOP && (
 													<img
-														className="m-1 p-0 w-9 md:w-14 2xl:w-20"
+														className="m-1 w-9 p-0 md:w-14 2xl:w-20"
 														src={tableOrder[PLAYER_POSITION_TOP].lastThrowedCardImg}
 													/>
 												)}
@@ -223,7 +250,7 @@ export default function gameRoom() {
 											{/* RIGHT */}
 											{tableOrder.length > PLAYER_POSITION_RIGHT && (
 												<img
-													className="m-1 p-0 w-9  md:w-14 2xl:w-20"
+													className="m-1 w-9 p-0  md:w-14 2xl:w-20"
 													src={tableOrder[PLAYER_POSITION_RIGHT].lastThrowedCardImg}
 												/>
 											)}
@@ -258,7 +285,6 @@ export default function gameRoom() {
 											<DialogContent className="bg-slate-700 sm:max-w-[425px]">
 												<DialogHeader>
 													<DialogTitle className="text-slate-100">Truco</DialogTitle>
-													<DialogDescription></DialogDescription>
 												</DialogHeader>
 												<div className="grid gap-4 py-4 text-slate-300">
 													Aguardando jogadores adversários...
@@ -326,7 +352,6 @@ export default function gameRoom() {
 				<DialogContent className="bg-slate-700 sm:max-w-[425px]">
 					<DialogHeader>
 						<DialogTitle className="text-slate-100">Truco</DialogTitle>
-						<DialogDescription></DialogDescription>
 					</DialogHeader>
 					<div className="grid gap-4 py-4">
 						<div className="text-slate-300">
@@ -344,6 +369,14 @@ export default function gameRoom() {
 								}
 							})()}
 						</div>
+						{(() => {
+							switch (partnerTrucoResponse) {
+								case 1:
+									return <div className="text-green-400">Seu parceiro aceitou!</div>
+								case 2:
+									return <div className="text-red-400">Seu parceiro correu!</div>
+							}
+						})()}
 						<div className="flex gap-4">
 							<button className="rounded-md bg-green-500 p-2 text-slate-100" onClick={acceptTruco}>
 								Aceitar
@@ -368,6 +401,41 @@ export default function gameRoom() {
 									})()}
 								</button>
 							)}
+						</div>
+					</div>
+				</DialogContent>
+			</Dialog>
+			<Dialog open={waitingPartnerTruco}>
+				<DialogContent className="bg-slate-700 sm:max-w-[425px]">
+					<DialogHeader>
+						<DialogTitle className="text-slate-100">Truco</DialogTitle>
+					</DialogHeader>
+					<div className="grid gap-4 py-4 text-slate-300">
+						Aguardando parceiro responder pedido de truco...
+					</div>
+				</DialogContent>
+			</Dialog>
+			<Dialog open={showModalEndHand} onOpenChange={setShowModalEndHand}>
+				<DialogContent className="bg-slate-700 sm:max-w-[425px]">
+					<DialogHeader className="relative text-slate-100">
+						<DialogTitle>Mão Finalizada</DialogTitle>
+						<DialogClose asChild>
+							<button className="absolute right-0 top-0 m-0 mb-1" type="button">
+								<Icon>close</Icon>
+							</button>
+						</DialogClose>
+					</DialogHeader>
+					<div className="grid gap-1 py-4 text-slate-300">
+						<div>A mão foi finalizada.</div>
+						<div>
+							{(() => {
+								switch (isHandWinner) {
+									case true:
+										return "Seu time venceu esta mão."
+									case false:
+										return "O time adversário venceu esta mão."
+								}
+							})()}
 						</div>
 					</div>
 				</DialogContent>
