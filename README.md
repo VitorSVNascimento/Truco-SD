@@ -1,17 +1,18 @@
 # Truco-SD
-Jogo de truco criado como trabalho final em equipe da disciplina de Sistemas Distribuidos
+### Jogo de truco com inteface gráfica, com duplas jogando via rede(cada um em sua máquina)
 ## Proposta do Projeto
- Projeto desenvolvido para a disciplina de Sistemas Distribuídos, lecionada pelo professor Rafael.
- - O projeto consiste em:
+ Projeto de turma desenvolvido para a disciplina de Sistemas Distribuídos, lecionada pelo professor Rafael.
+ <br>
+ O projeto consiste em:
    
    | | ÁREA | DESCRIÇÃO | |
    | --- | --- | --- | --- |
-   ||  |  ||
-   ||  |  ||
-   ||  |  ||
-   || |  ||
-   || |  ||
-   ||  |  ||
+   || Interface Gráfica | A interface poderia ser uma aplicação desktop, web ou mobile. ||
+   || Comunicação |  Comunicação remota (sockets, HTTP, Firebase, etc.). ||
+   || Arquitetura | Cliente-servidor, P2P ou híbrida. ||
+   || Recuperação de erros | Caso um dos usuários desconecte ou caia, a dupla perderá a partida, sendo contabilizado no placar. ||
+   || Bots | Ter de 1 a 4 pessoas, onde se faltar jogadores seram subtituídos por bots simples. ||
+   || Execução do Truco | - Exibição e manipulação das cartas; <br> - Nome dos jogadores/bots; <br> - Botão de chamar truco; <br> - Contabilização de pontos por jogador.<br> - Jogadores poderam jogar em máquinas diferentes ou iguais;<br> - Placar de contabilizar as vitórias de cada jogador; <br> - Comunicação entre os jogadores (via chat de texto ou via áudio.||
   
   ## Resultados do Projeto
    - A seguir apresentaremos algumas imagens e vídeo do jogo de truco funcionando.
