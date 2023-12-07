@@ -136,8 +136,13 @@ export default function gameRoom() {
 			setTurn(turn + 1)
 		})
 
+		socket.on("end_round", (data) => {
+			console.log("end_round", data)
+		})
+
 		return () => {
 			socket.off("throwed_card")
+			socket.off("end_round")
 		}
 	}, [cards, tableOrder])
 
@@ -177,42 +182,42 @@ export default function gameRoom() {
 											/>
 										)}
 									</div>
-									<div className="col-span-4 rounded-full border-4 border-orange-400 bg-green-500 grid h-full grid-rows-3">
-										<div className="row-span-1 flex items-center justify-center">
-											{/* TOP */}
-											{tableOrder.length > PLAYER_POSITION_TOP && (
+									<div className="col-span-4 rounded-full border-4 border-orange-400 bg-green-500 grid h-full grid-cols-3">
+										<div className="col-span-1 flex items-center justify-center">
+											{/* LEFT */}
+											{tableOrder.length > PLAYER_POSITION_LEFT && (
 												<img
-													className="m-1 w-9 p-0 md:w-20"
-													src={tableOrder[PLAYER_POSITION_TOP].lastThrowedCardImg}
+													className="m-1 p-0 w-9 md:w-14 2xl:w-20"
+													src={tableOrder[PLAYER_POSITION_LEFT].lastThrowedCardImg}
 												/>
 											)}
 										</div>
-										<div className="row-span-1 grid h-full grid-cols-2">
-											<div className="col-span-1 flex items-center justify-center">
-												{/* LEFT */}
-												{tableOrder.length > PLAYER_POSITION_LEFT && (
+										<div className="col-span-1 grid h-full grid-rows-2">
+											<div className="rpw-span-1 flex items-center justify-center">
+												{/* TOP */}
+												{tableOrder.length > PLAYER_POSITION_TOP && (
 													<img
-														className="m-1 w-9 p-0 md:w-20"
-														src={tableOrder[PLAYER_POSITION_LEFT].lastThrowedCardImg}
+														className="m-1 p-0 w-9 md:w-14 2xl:w-20"
+														src={tableOrder[PLAYER_POSITION_TOP].lastThrowedCardImg}
 													/>
 												)}
 											</div>
-											<div className="col-span-1 flex items-center justify-center">
-												{/* RIGHT */}
-												{tableOrder.length > PLAYER_POSITION_RIGHT && (
+											<div className="rpw-span-1 flex items-center justify-center">
+												{/* BOTTOM */}
+												{tableOrder.length > PLAYER_POSITION_BOTTOM && (
 													<img
-														className="m-1 w-9 p-0 md:w-20"
-														src={tableOrder[PLAYER_POSITION_RIGHT].lastThrowedCardImg}
+														className="m-1 p-0 w-9 md:w-14 2xl:w-20"
+														src={tableOrder[PLAYER_POSITION_BOTTOM].lastThrowedCardImg}
 													/>	
 												)}
 											</div>
 										</div>
-										<div className="row-span-1 flex items-center justify-center">
-											{/* BOTTOM */}
-											{tableOrder.length > PLAYER_POSITION_BOTTOM && (
+										<div className="col-span-1 flex items-center justify-center">
+											{/* RIGHT */}
+											{tableOrder.length > PLAYER_POSITION_RIGHT && (
 												<img
-													className="m-1 w-9 p-0 md:w-20"
-													src={tableOrder[PLAYER_POSITION_BOTTOM].lastThrowedCardImg}
+													className="m-1 p-0 w-9  md:w-14 2xl:w-20"
+													src={tableOrder[PLAYER_POSITION_RIGHT].lastThrowedCardImg}
 												/>
 											)}
 										</div>
