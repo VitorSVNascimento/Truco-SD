@@ -39,6 +39,12 @@ export default function gameRoom() {
 	const [proposedHandValue, setProposedHandValue] = useState(2)
 	const [showModalEndHand, setShowModalEndHand] = useState(false)
 	const [isHandWinner, setIsHandWinner] = useState(false)
+	const [NULL_POINT] = useState(0)
+	const [TEAM_POINT] = useState(1)
+	const [OPPONENT_POINT] = useState(2)
+	const [POINT_IMAGE] = useState("-point.svg")
+	const [handPoints, setHandPoints] = useState<number[]>([NULL_POINT, NULL_POINT, NULL_POINT])
+	const [round, setRound] = useState(0)
 
 	const toggleChat = () => {
 		const chat = document.querySelector("#chat")
@@ -85,7 +91,7 @@ export default function gameRoom() {
 		setTableOrder(newArray)
 	}
 
-	const updateTableOrder = (newData: any) => {
+	const updateTableData = (newData: any) => {
 		return tableOrder?.map((player) => {
 			if (player.name === newData.username) {
 				return {
@@ -98,9 +104,14 @@ export default function gameRoom() {
 		})
 	}
 
+	const updateRoundPoints = (index: number, newValue: number) => {
+		const newArray = handPoints.map((value, i) => (index === -1 || index === i) ? newValue : value);
+		setHandPoints(newArray);
+	}
+
 	useEffect(() => {
 		reorganizeTableOrder()
-	}, [])
+	}, [roundOrder])
 
 	useEffect(() => {
 		socket.on("receive_truco", (data: any) => {
@@ -139,6 +150,10 @@ export default function gameRoom() {
 			else setIsHandWinner(false)
 			setShowModalEndHand(true)
 			setWaitingPartnerTruco(false)
+			// eslint-disable-next-line camelcase
+			setRoundOrder(data.new_order)
+			setTurn(0)
+			playAudio("sounds/shufflingCards.wav")
 		})
 
 		socket.on("waiting_truco", (data) => {
@@ -158,7 +173,6 @@ export default function gameRoom() {
 			socket.off("receive_truco")
 			socket.off("accepted_truco")
 			socket.off("declined_truco")
-			socket.off("throwed_card")
 			socket.off("your_cards")
 			socket.off("end_hand")
 		}
@@ -166,7 +180,7 @@ export default function gameRoom() {
 
 	useEffect(() => {
 		socket.on("throwed_card", (data) => {
-			setTableOrder(updateTableOrder(data))
+			setTableOrder(updateTableData(data))
 			setTurn(turn + 1)
 			playAudio(`sounds/${Math.floor(Math.random() * 2)}-flip.mp3`)
 		})
@@ -177,10 +191,8 @@ export default function gameRoom() {
 			setRoundOrder(data.new_order)
 			reorganizeTableOrder()
 			setTurn(0)
-		})
-
-		socket.on("end_hand", (data) => {
-			console.log("end_hand", data)
+			updateRoundPoints(round, (data.team == player.team) ? TEAM_POINT : OPPONENT_POINT)
+			setRound(round + 1)
 		})
 
 		return () => {
@@ -202,7 +214,24 @@ export default function gameRoom() {
 						<div className="m-0 grid h-full grid-rows-6 gap-2 p-0 ">
 							<div className="row-span-1 items-center justify-center">
 								<div className="grid h-full grid-cols-3">
-									<div className="col-span-1 items-center justify-center"></div>
+									{/* Placar da mão*/}
+									<div className="col-span-1 grid grid-rows-2 items-center justify-center text-xs row-span-1 font-mono font-semibold md:text-base">
+										<div className="row-span-1">Pontos da mão: </div>
+										<div className="row-span-1 grid grid-cols-3 bg-slate-50 rounded-lg">
+											<img
+												className="m-1 w-5 p-0 md:w-9 2xl:w-20"
+												src={`${handPoints[0]}${POINT_IMAGE}`}
+											/>
+											<img
+												className="m-1 w-5 p-0 md:w-9 2xl:w-20"
+												src={`${handPoints[1]}${POINT_IMAGE}`}
+											/>
+											<img
+												className="m-1 w-5 p-0 md:w-9 2xl:w-20"
+												src={`${handPoints[2]}${POINT_IMAGE}`}
+											/>
+										</div>
+									</div>
 									<div className="col-span-1 flex items-center justify-center">
 										{tableOrder.length > PLAYER_POSITION_TOP && (
 											<GameRoomPlayer
@@ -249,7 +278,7 @@ export default function gameRoom() {
 												{/* BOTTOM */}
 												{tableOrder.length > PLAYER_POSITION_BOTTOM && (
 													<img
-														className="m-1 w-9 p-0 md:w-20"
+														className="m-1 w-9 p-0 md:w-14 2xl:w-20"
 														src={tableOrder[PLAYER_POSITION_BOTTOM].lastThrowedCardImg}
 													/>
 												)}
@@ -259,7 +288,7 @@ export default function gameRoom() {
 											{/* RIGHT */}
 											{tableOrder.length > PLAYER_POSITION_RIGHT && (
 												<img
-													className="m-1 w-9 p-0  md:w-14 2xl:w-20"
+													className="m-1 w-9 p-0 md:w-14 2xl:w-20"
 													src={tableOrder[PLAYER_POSITION_RIGHT].lastThrowedCardImg}
 												/>
 											)}
@@ -326,15 +355,16 @@ export default function gameRoom() {
 										)}
 									</div>
 									<div className="row-span-1 flex items-center justify-center gap-2">
-										<div className="grid grid-rows-2">
+										<div className="grid grid-rows-3">
 											<div className="row-span-1 truncate font-mono text-2xl font-semibold capitalize antialiased md:text-4xl">
 												{player?.name}
 											</div>
-											{myTurn && (
-												<div className="text-1xl row-span-1 font-mono font-semibold antialiased md:text-2xl">
-													Sua vez!
-												</div>
-											)}
+											<div className="text-xs row-span-1 font-mono font-semibold antialiased md:text-base">
+												Time {player?.team}
+											</div>
+											<div className={`text-1xl row-span-1 font-mono font-semibold antialiased md:text-2xl ${myTurn ? "" : "opacity-0"}`}>
+												Seu turno!
+											</div>
 										</div>
 									</div>
 								</div>
