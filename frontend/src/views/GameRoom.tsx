@@ -336,7 +336,31 @@ export default function gameRoom() {
 											/>
 										)}
 									</div>
-									<div className="col-span-1 items-center justify-center"></div>
+									<div className="col-span-1 row-span-1 grid grid-rows-1 items-center justify-center font-mono text-xs font-semibold md:text-base 2xl:text-2xl">
+										<table className="row-span-1 table-fixed items-center justify-center text-center">
+											<thead>
+												<tr>
+													<th></th>
+													<th className="border pl-2 pr-2">Pontos</th>
+													<th className="border pl-2 pr-2">Tentos</th>
+													<th className="border pl-2 pr-2">Jogos</th>
+												</tr>
+											</thead>
+											<tbody>
+												<tr>
+													<td className="border pl-2 pr-2">Time 1</td>
+													<td className="border pl-2 pr-2">2</td>
+													<td rowSpan={2} className="border pl-2 pr-2 text-2xl md:text-3xl">2</td>
+													<td className="border pl-2 pr-2">0</td>
+												</tr>
+												<tr>
+													<td className="border pl-2 pr-2">Time 2</td>
+													<td className="border pl-2 pr-2">10</td>
+													<td className="border pl-2 pr-2">5</td>
+												</tr>
+											</tbody>
+										</table>
+									</div>
 								</div>
 							</div>
 
@@ -402,7 +426,7 @@ export default function gameRoom() {
 							</div>
 
 							<div className="row-span-2">
-								<div className="grid h-full grid-cols-3">
+								<div className="grid grid-cols-3 md:h-full">
 									<div className="row-span-1 flex items-center justify-center">
 										<Dialog open={waitingAcceptTruco}>
 											<DialogTrigger asChild>
@@ -430,8 +454,8 @@ export default function gameRoom() {
 										{cards?.map(
 											(c: { code: null | undefined; url_image: string }, index: number) => (
 												<button
-													className={`m-1 w-14 md:w-28 ${
-														myTurn ? "transform transition-transform hover:translate-y-[-7px]" : ""
+													className={`mr-1 ml-1 w-14 md:w-28 ${
+														myTurn ? "md:transform md:transition-transform md:hover:translate-y-[-7px]" : ""
 													} ${
 														!myTurn
 															? "opacity-80 grayscale"
@@ -450,7 +474,7 @@ export default function gameRoom() {
 											),
 										)}
 									</div>
-									<div className="row-span-1 flex items-center justify-center gap-2">
+									<div className="row-span-1 flex items-center justify-center">
 										<div className="grid grid-rows-3">
 											<div className="row-span-1 truncate font-mono text-2xl font-semibold capitalize antialiased md:text-4xl">
 												{player?.name}
