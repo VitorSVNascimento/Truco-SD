@@ -42,6 +42,7 @@ export default function gameRoom() {
 	const [NULL_POINT] = useState(0)
 	const [TEAM_POINT] = useState(1)
 	const [OPPONENT_POINT] = useState(2)
+	const [DRAW_POINT] = useState(3)
 	const [POINT_IMAGE] = useState("-point.svg")
 	const [handPoints, setHandPoints] = useState<number[]>([NULL_POINT, NULL_POINT, NULL_POINT])
 	const [round, setRound] = useState(0)
@@ -192,9 +193,8 @@ export default function gameRoom() {
 			console.log("end_round", data)
 			// eslint-disable-next-line camelcase
 			setRoundOrder(data.new_order)
-			reorganizeTableOrder()
 			setTurn(0)
-			updateRoundPoints(round, (data.team == player.team) ? TEAM_POINT : OPPONENT_POINT)
+			updateRoundPoints(round, (data.team == player.team) ? TEAM_POINT : ((data.team == 3) ? DRAW_POINT : OPPONENT_POINT))
 			setRound(round + 1)
 		})
 
@@ -220,17 +220,17 @@ export default function gameRoom() {
 									{/* Placar da mão*/}
 									<div className="col-span-1 grid grid-rows-2 items-center justify-center text-xs 2xl:text-2xl row-span-1 font-mono font-semibold md:text-base">
 										<div className="row-span-1">Pontos da mão: </div>
-										<div className="row-span-1 grid grid-cols-3 bg-slate-50 rounded-lg">
+										<div className="row-span-1 grid grid-cols-3">
 											<img
-												className="m-1 w-5 p-0 md:w-9 2xl:w-14"
+												className="m-1 w-5 p-0 md:w-9 2xl:w-14 bg-slate-50 rounded-full"
 												src={`${handPoints[0]}${POINT_IMAGE}`}
 											/>
 											<img
-												className="m-1 w-5 p-0 md:w-9 2xl:w-14"
+												className="m-1 w-5 p-0 md:w-9 2xl:w-14 bg-slate-50 rounded-full"
 												src={`${handPoints[1]}${POINT_IMAGE}`}
 											/>
 											<img
-												className="m-1 w-5 p-0 md:w-9 2xl:w-14"
+												className="m-1 w-5 p-0 md:w-9 2xl:w-14 bg-slate-50 rounded-full"
 												src={`${handPoints[2]}${POINT_IMAGE}`}
 											/>
 										</div>
