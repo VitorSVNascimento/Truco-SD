@@ -36,7 +36,7 @@ export default function gameRoom() {
 	const [PLAYER_POSITION_RIGHT] = useState(1)
 	const [PLAYER_POSITION_TOP] = useState(2)
 	const [PLAYER_POSITION_LEFT] = useState(3)
-	const [handValue, setHandValue] = useState(2)
+	const [roundValue, setRoundValue] = useState(2)
 	const [TEAM_1] = useState(0)
 	const [TEAM_2] = useState(1)
 	const [teamPoints, setTeamPoints] = useState<any[]>([{id: 1, points: 0, games: 0 }, {id: 2, points: 0, games: 0 }]);
@@ -48,6 +48,7 @@ export default function gameRoom() {
 	const [POINT_IMAGE] = useState("-point.svg")
 	const [handPoints, setHandPoints] = useState<number[]>([NULL_POINT, NULL_POINT, NULL_POINT])
 	const [round, setRound] = useState(0)
+	const [playerCalledTrick, setPlayerCalledTrick] = useState(false)
 	const [chatEvent, setChatEvent] = useState<EventData>({
 		event: "",
 		data: {},
@@ -70,6 +71,7 @@ export default function gameRoom() {
 	const callTruco = () => {
 		socket.emit("call_truco")
 		console.log("TRUCOOOOOOOOOO")
+		setPlayerCalledTrick(true)
 	}
 
 	const acceptTruco = () => {
@@ -154,7 +156,7 @@ export default function gameRoom() {
 		socket.on("accepted_truco", (data) => {
 			console.log("accepted_truco", data)
 
-			setHandValue(data["new_hand_value"])
+			setRoundValue(data["new_hand_value"])
 			if (waitingAcceptTruco) {
 				setWaitingAcceptTruco(false)
 
@@ -200,7 +202,7 @@ export default function gameRoom() {
 					},
 				}
 
-				switch (handValue) {
+				switch (roundValue) {
 					case 2:
 						event.data.message = "O adversário recusou o truco!"
 						break
@@ -252,7 +254,7 @@ export default function gameRoom() {
 				if(team.id == data["winner"]) {
 					return {
 						...team,
-						points: team.points + handValue,
+						points: team.points + roundValue,
 					}
 				}
 				return team
@@ -268,9 +270,10 @@ export default function gameRoom() {
 			setRoundOrder(data.new_order)
 			roundResetTableOrder()
 			setTurn(0)
+			setPlayerCalledTrick(false)
 			updateRoundPoints(-1, NULL_POINT)
 			setRound(0)
-			setHandValue(2)
+			setRoundValue(2)
 			playAudio("sounds/shufflingCards.wav")
 			resetTableOrder()
 		})
@@ -315,7 +318,7 @@ export default function gameRoom() {
 			socket.off("accepted_ten_hand")
 			socket.off("declined_ten_hand")
 		}
-	}, [waitingAcceptTruco, handValue, teamPoints])
+	}, [waitingAcceptTruco, roundValue, teamPoints])
 
 	useEffect(() => {
 		socket.on("throwed_card", (data) => {
@@ -331,6 +334,7 @@ export default function gameRoom() {
 			setRoundOrder(data.new_order)
 			roundResetTableOrder()
 			setTurn(0)
+			setPlayerCalledTrick(false)
 			updateRoundPoints(
 				round,
 				data.team == player.team ? TEAM_POINT : data.team == 3 ? DRAW_POINT : OPPONENT_POINT,
@@ -397,13 +401,13 @@ export default function gameRoom() {
 												<tr>
 													<td className="border pl-2 pr-2">Time 1</td>
 													<td className="border pl-2 pr-2">{teamPoints[TEAM_1]?.points}</td>
-													<td rowSpan={2} className="border pl-2 pr-2 text-2xl md:text-3xl">{handValue}</td>
+													<td rowSpan={2} className="border pl-2 pr-2 text-2xl md:text-3xl">{roundValue}</td>
 													<td className="border pl-2 pr-2">{teamPoints[TEAM_1]?.games}</td>
 												</tr>
 												<tr>
 													<td className="border pl-2 pr-2">Time 2</td>
 													<td className="border pl-2 pr-2">{teamPoints[TEAM_2]?.points}</td>
-													<td className="border pl-2 pr-2">{teamPoints[TEAM_2]?.points}</td>
+													<td className="border pl-2 pr-2">{teamPoints[TEAM_2]?.games}</td>
 												</tr>
 											</tbody>
 										</table>
@@ -482,10 +486,22 @@ export default function gameRoom() {
 													className="flex rounded-full bg-blue-500 p-3 text-gray-50 shadow-sm focus-within:bg-red-700 focus-within:outline hover:bg-red-600 disabled:bg-gray-500"
 													type="button"
 													onClick={callTruco}
-													disabled={!myTurn || waitingAcceptTruco || handValue >= 10}
+													disabled={!myTurn || waitingAcceptTruco || roundValue > 10 || playerCalledTrick}
 												>
-													TRUUUUUUUCO {handValue}
-												</button>
+													{(() => {
+														switch (roundValue) {
+															case 2:
+																return "TRUUUUUUUCO"
+															case 4:
+																return "SEIS SÓ"
+															case 8:
+																return "VALE NOVE"
+															case 10:
+																return "DOZEE NELE!"
+															default:
+																return "Chega meu fi"
+														}
+													})()}</button>
 											</DialogTrigger>
 											<DialogContent className="bg-slate-700 sm:max-w-[425px]">
 												<DialogHeader>
