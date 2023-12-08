@@ -81,7 +81,7 @@ export default function gameRoom() {
 		setTrucoRequested(false)
 	}
 
-	const reorganizeTableOrder = () => {
+	const resetTableOrder = () => {
 		const newArray = roundOrder
 			.slice(roundOrder.indexOf(player.name))
 			.concat(roundOrder.slice(0, roundOrder.indexOf(player.name)))
@@ -107,14 +107,23 @@ export default function gameRoom() {
 		})
 	}
 
+	const roundResetTableData = () => {
+		setTableOrder(tableOrder?.map((player) => {
+			return {
+				...player,
+				lastThrowedCardImg: CARD_PATTERN,
+			}
+		}))
+	}
+
 	const updateRoundPoints = (index: number, newValue: number) => {
 		const newArray = handPoints.map((value, i) => (index === -1 || index === i ? newValue : value))
 		setHandPoints(newArray)
 	}
 
 	useEffect(() => {
-		reorganizeTableOrder()
-	}, [roundOrder])
+		resetTableOrder()
+	}, [])
 
 	useEffect(() => {
 		socket.on("receive_truco", (data: any) => {
@@ -239,6 +248,7 @@ export default function gameRoom() {
 			setRound(0)
 			setHandValue(2)
 			playAudio("sounds/shufflingCards.wav")
+			resetTableOrder()
 		})
 
 		socket.on("waiting_truco", (data) => {
@@ -275,6 +285,7 @@ export default function gameRoom() {
 			console.log("end_round", data)
 			// eslint-disable-next-line camelcase
 			setRoundOrder(data.new_order)
+			roundResetTableData()
 			setTurn(0)
 			updateRoundPoints(round, (data.team == player.team) ? TEAM_POINT : ((data.team == 3) ? DRAW_POINT : OPPONENT_POINT))
 			setRound(round + 1)
