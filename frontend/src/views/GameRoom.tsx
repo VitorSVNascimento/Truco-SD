@@ -36,6 +36,9 @@ export default function gameRoom() {
 	const [PLAYER_POSITION_TOP] = useState(2)
 	const [PLAYER_POSITION_LEFT] = useState(3)
 	const [handValue, setHandValue] = useState(2)
+	const [TEAM_1] = useState(0)
+	const [TEAM_2] = useState(1)
+	const [teamPoints, setTeamPoints] = useState<any[]>([{id: 1, points: 0, games: 0 }, {id: 2, points: 0, games: 0 }]);
 	const [proposedHandValue, setProposedHandValue] = useState(2)
 	const [NULL_POINT] = useState(0)
 	const [TEAM_POINT] = useState(1)
@@ -234,6 +237,16 @@ export default function gameRoom() {
 			} else {
 				event.data.message = "O adversário venceu a mão!"
 			}
+			
+			setTeamPoints(teamPoints?.map((team) => {
+				if(team.id == data["winner"]) {
+					return {
+						...team,
+						points: team.points + handValue,
+					}
+				}
+				return team
+			}))
 
 			setChatEvent(event)
 			setTimeout(() => {
@@ -243,6 +256,7 @@ export default function gameRoom() {
 			setWaitingPartnerTruco(false)
 			// eslint-disable-next-line camelcase
 			setRoundOrder(data.new_order)
+			roundResetTableOrder()
 			setTurn(0)
 			updateRoundPoints(-1, NULL_POINT)
 			setRound(0)
@@ -271,7 +285,7 @@ export default function gameRoom() {
 			socket.off("your_cards")
 			socket.off("end_hand")
 		}
-	}, [waitingAcceptTruco, handValue])
+	}, [waitingAcceptTruco, handValue, teamPoints])
 
 	useEffect(() => {
 		socket.on("throwed_card", (data) => {
@@ -297,9 +311,9 @@ export default function gameRoom() {
 		}
 	}, [cards, tableOrder])
 
-	useEffect(() => {
-		setMyTurn(roundOrder.length > 0 && player.name === roundOrder[turn])
-	}, [turn])
+	useEffect(() => {         
+		setMyTurn(roundOrder.length > 0 && player.name === roundOrder[turn])     
+	}, [turn, roundOrder])
 
 	return (
 		<div className="min-h-screen bg-gradient-to-bl from-blue-700 via-blue-800 to-slate-700 text-white/90 md:grid md:grid-cols-5 md:content-normal md:gap-4 md:bg-white/90">
@@ -349,14 +363,14 @@ export default function gameRoom() {
 											<tbody>
 												<tr>
 													<td className="border pl-2 pr-2">Time 1</td>
-													<td className="border pl-2 pr-2">2</td>
-													<td rowSpan={2} className="border pl-2 pr-2 text-2xl md:text-3xl">2</td>
-													<td className="border pl-2 pr-2">0</td>
+													<td className="border pl-2 pr-2">{teamPoints[TEAM_1]?.points}</td>
+													<td rowSpan={2} className="border pl-2 pr-2 text-2xl md:text-3xl">{handValue}</td>
+													<td className="border pl-2 pr-2">{teamPoints[TEAM_1]?.games}</td>
 												</tr>
 												<tr>
 													<td className="border pl-2 pr-2">Time 2</td>
-													<td className="border pl-2 pr-2">10</td>
-													<td className="border pl-2 pr-2">5</td>
+													<td className="border pl-2 pr-2">{teamPoints[TEAM_2]?.points}</td>
+													<td className="border pl-2 pr-2">{teamPoints[TEAM_2]?.points}</td>
 												</tr>
 											</tbody>
 										</table>
