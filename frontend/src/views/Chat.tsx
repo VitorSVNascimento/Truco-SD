@@ -1,13 +1,13 @@
 import { useState, useRef, useEffect, useContext } from "react"
 import { useNavigate } from "react-router-dom"
-import { Message } from "../types/types"
+import { EventData, Message } from "../types/types"
 import ChatMessageInput from "../components/chat/ChatMessageInput"
 import ChatMessages from "../components/chat/ChatMessages"
 import SocketContext from "../contexts/SocketContext"
 import { UserContext } from "../contexts/UserContext"
 import { getRandomInt, playAudio } from "@/utils/utils"
 
-export default function Chat(props: { player?: any }) {
+export default function Chat(props: { player?: any; event: EventData }) {
 	const [messages, setMessages] = useState<Message[]>([])
 	const messagesDivRef = useRef<HTMLDivElement>(null)
 	const socket = useContext(SocketContext)
@@ -16,29 +16,45 @@ export default function Chat(props: { player?: any }) {
 	const [EASTER_EGG] = useState("Ao potência")
 
 	useEffect(() => {
+		let message: Message
+		switch (props.event.event as any) {
+			case "chat_end_hand":
+				message = {
+					id: getRandomInt(10000, 100000),
+					type: "end_hand",
+					text: props.event.data.message,
+					bgColor: "bg-orange-500",
+				}
+
+				setMessages((prevMessages) => [...prevMessages, message])
+				break
+			case "chat_accepted_truco":
+				message = {
+					id: getRandomInt(10000, 100000),
+					type: "accepted_truco",
+					text: props.event.data.message,
+					bgColor: "bg-green-400",
+				}
+
+				setMessages((prevMessages) => [...prevMessages, message])
+				break
+			case "chat_declined_truco":
+				message = {
+					id: getRandomInt(10000, 100000),
+					type: "declined_truco",
+					text: props.event.data.message,
+					bgColor: "bg-red-400",
+				}
+
+				setMessages((prevMessages) => [...prevMessages, message])
+				break
+		}
+	}, [props.event])
+
+	useEffect(() => {
 		if (user === null) {
 			navigate("/")
 		}
-
-		socket.on("end_hand", (data) => {
-			let isHandWinner = false
-			if (data["winner"] == props.player.team) isHandWinner = true
-
-			const message = {
-				id: getRandomInt(10000, 100000),
-				type: "end_hand",
-				text: "",
-				bgColor: "bg-orange-500",
-			}
-
-			if (isHandWinner) {
-				message.text = "Seu time venceu a mão!"
-			} else {
-				message.text = "O adversário venceu a mão!"
-			}
-
-			setMessages((prevMessages) => [...prevMessages, message])
-		})
 
 		socket.on("new_message", (message: Message) => {
 			console.log("new_message", message)

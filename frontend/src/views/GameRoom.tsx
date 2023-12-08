@@ -12,6 +12,7 @@ import {
 	DialogTrigger,
 } from "@/components/ui/dialog"
 import GameRoomPlayer from "../components/gameRoom/GameRoomPlayer"
+import { EventData } from "../types/types"
 
 export default function gameRoom() {
 	const location = useLocation()
@@ -42,6 +43,10 @@ export default function gameRoom() {
 	const [POINT_IMAGE] = useState("-point.svg")
 	const [handPoints, setHandPoints] = useState<number[]>([NULL_POINT, NULL_POINT, NULL_POINT])
 	const [round, setRound] = useState(0)
+	const [chatEvent, setChatEvent] = useState<EventData>({
+		event: "",
+		data: {},
+	})
 
 	const toggleChat = () => {
 		const chat = document.querySelector("#chat")
@@ -118,21 +123,80 @@ export default function gameRoom() {
 			if (data.team == player.team) setWaitingAcceptTruco(true)
 			else {
 				setTrucoRequested(true)
+				setWaitingAcceptTruco(false)
 				setProposedHandValue(data["proposed_value"])
 			}
 		})
 
 		socket.on("accepted_truco", (data) => {
 			console.log("accepted_truco", data)
-			setHandValue(data["new_hand_value"])
-			if (waitingAcceptTruco) setWaitingAcceptTruco(false)
-			else setTrucoRequested(false)
+
+			if (waitingAcceptTruco) {
+				setHandValue(data["new_hand_value"])
+				setWaitingAcceptTruco(false)
+
+				const event = {
+					event: "chat_accepted_truco",
+					data: {
+						message: "",
+					},
+				}
+
+				switch (data["new_hand_value"]) {
+					case 4:
+						event.data.message = "O adversário aceitou o truco!"
+						break
+					case 8:
+						event.data.message = "O adversário aceitou o pedido de 6!"
+						break
+					case 10:
+						event.data.message = "O adversário aceitou o pedido de 9!"
+						break
+					case 12:
+						event.data.message = "O adversário aceitou o pedido de 12!"
+						break
+				}
+
+				setChatEvent(event)
+				setTimeout(() => {
+					setChatEvent({ event: "", data: {} })
+				}, 1000)
+			} else {
+				setTrucoRequested(false)
+			}
 		})
 
 		socket.on("declined_truco", (data) => {
 			console.log("declined_truco", data)
-			if (waitingAcceptTruco) setWaitingAcceptTruco(false)
-			else setTrucoRequested(false)
+			if (waitingAcceptTruco) {
+				setWaitingAcceptTruco(false)
+				const event = {
+					event: "chat_declined_truco",
+					data: {
+						message: "",
+					},
+				}
+
+				switch (handValue) {
+					case 2:
+						event.data.message = "O adversário recusou o truco!"
+						break
+					case 4:
+						event.data.message = "O adversário recusou o pedido de 6!"
+						break
+					case 8:
+						event.data.message = "O adversário recusou o pedido de 9!"
+						break
+					case 10:
+						event.data.message = "O adversário recusou o pedido de 12!"
+						break
+				}
+
+				setChatEvent(event)
+				setTimeout(() => {
+					setChatEvent({ event: "", data: {} })
+				}, 1000)
+			} else setTrucoRequested(false)
 			setWaitingPartnerTruco(false)
 		})
 
@@ -143,12 +207,36 @@ export default function gameRoom() {
 
 		socket.on("end_hand", (data) => {
 			console.log("end_hand", data)
+
+			let isHandWinner = false
+
+			if (data["winner"] == player.team) isHandWinner = true
+
+			const event = {
+				event: "chat_end_hand",
+				data: {
+					message: "",
+				},
+			}
+
+			if (isHandWinner) {
+				event.data.message = "Seu time venceu a mão!"
+			} else {
+				event.data.message = "O adversário venceu a mão!"
+			}
+
+			setChatEvent(event)
+			setTimeout(() => {
+				setChatEvent({ event: "", data: {} })
+			}, 1000)
+
 			setWaitingPartnerTruco(false)
 			// eslint-disable-next-line camelcase
 			setRoundOrder(data.new_order)
 			setTurn(0)
 			updateRoundPoints(-1, NULL_POINT)
 			setRound(0)
+			setHandValue(2)
 			playAudio("sounds/shufflingCards.wav")
 		})
 
@@ -179,7 +267,7 @@ export default function gameRoom() {
 			setTableOrder(updateTableData(data))
 			setTurn(turn + 1)
 			playAudio(`sounds/${Math.floor(Math.random() * 2)}-flip.mp3`)
-			console.log("throwed card" , data)
+			console.log("throwed card", data)
 		})
 
 		socket.on("end_round", (data) => {
@@ -378,7 +466,7 @@ export default function gameRoom() {
 				id="chat"
 				className="absolute left-0 top-0 hidden w-full md:relative md:col-span-1 md:block md:opacity-100"
 			>
-				<Chat player={player} />
+				<Chat player={player} event={chatEvent} />
 			</div>
 			<button
 				id="toggleChatButton"
