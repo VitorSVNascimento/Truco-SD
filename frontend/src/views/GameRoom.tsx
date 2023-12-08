@@ -136,6 +136,16 @@ export default function gameRoom() {
 		socket.emit("decline_ten_hand")
 	}
 
+	const resetGlobalScore = (score: any[]) => {
+		setTeamPoints(teamPoints?.map((team) => {
+			return {
+				...team,
+				points: 0,
+				games: score[team.id - 1]
+			}
+		}))
+	}
+
 	useEffect(() => {
 		resetTableOrder()
 	}, [])
@@ -265,6 +275,10 @@ export default function gameRoom() {
 				setChatEvent({ event: "", data: {} })
 			}, 1000)
 
+			if (data["game_score"][0] == 0 && data["game_score"][0] == 0){
+				resetGlobalScore(data["overall_score"])
+			}
+
 			setWaitingPartnerTruco(false)
 			// eslint-disable-next-line camelcase
 			setRoundOrder(data.new_order)
@@ -353,7 +367,7 @@ export default function gameRoom() {
 	}, [turn, roundOrder])
 
 	return (
-		<div className="min-h-screen  bg-green-700 text-white/90 md:grid md:grid-cols-5 md:content-normal md:gap-4">
+		<div className="min-h-screen bg-green-700 text-white/90 md:grid md:grid-cols-5 md:content-normal md:gap-4">
 			<div className="md:col-span-4 md:justify-center">
 				<div className="m-0 grid h-full grid-rows-1 gap-2 p-2">
 					{/* Mesa */}
