@@ -14,11 +14,11 @@ export default function GameRoomPlayer(props: { playerName: string; cardsNumber:
 						{props.playerName}
 					</div>
 				</div>
-				<img
+				{ props.cardsNumber > 0 && (<img
 					className="m-1 w-7 p-0 md:w-10"
 					src={imageSrc}
 					alt={`Cartas do jogador ${props.playerName}.`}
-				/>
+				/>)}
 			</div>
 		</>
 	)
