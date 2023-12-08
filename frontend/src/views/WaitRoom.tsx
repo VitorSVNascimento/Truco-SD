@@ -53,19 +53,32 @@ export default function waitRoom() {
 			playAudio("sounds/joinBeep.mp3")
 			const dataPlayers = data["players"]
 
-			const team1 = dataPlayers.at(0).map((player: string) => ({ name: player, team: "team1" }))
+			const team1 = dataPlayers.at(0).map((player: string) => ({ name: player, team: "1" }))
 			while (team1.length < 2) {
-				team1.push({ name: "", team: "team1" })
+				team1.push({ name: "", team: "1" })
 			}
 
-			const team2 = dataPlayers.at(1).map((player: string) => ({ name: player, team: "team2" }))
+			const team2 = dataPlayers.at(1).map((player: string) => ({ name: player, team: "2" }))
 			while (team2.length < 2) {
-				team2.push({ name: "", team: "team2" })
+				team2.push({ name: "", team: "2" })
 			}
 
 			setPlayers([...team1, ...team2])
 		})
 
+		socket.on("disconnect", () => {
+			console.log("Disconnected")
+		})
+
+		// Cleanup function to remove the event listeners when the component unmounts
+		return () => {
+			socket.off("your_cards")
+			socket.off("connect_successfully")
+			socket.off("disconnect")
+		}
+	}, [])
+
+	useEffect(() => {
 		socket.on("your_cards", (initialGameData: any) => {
 			console.log("your_cards", initialGameData)
 			playAudio("sounds/shufflingCards.wav")
@@ -80,18 +93,7 @@ export default function waitRoom() {
 				},
 			})
 		})
-
-		socket.on("disconnect", () => {
-			console.log("Disconnected")
-		})
-
-		// Cleanup function to remove the event listeners when the component unmounts
-		return () => {
-			socket.off("your_cards")
-			socket.off("connect_successfully")
-			socket.off("disconnect")
-		}
-	}, [])
+	}, [players])
 
 	return (
 		<>
