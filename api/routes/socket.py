@@ -9,6 +9,7 @@ from models.player import Player
 from models.hand_resullt import HandResult
 from models.card import Card
 from models.bot import Bot
+from time import sleep
 
 messageCount = 0
 players = []
@@ -20,6 +21,8 @@ RM_ROOM_NOT_EXIST = 3
 
 TEN_HAND = 10
 TEN_HAND_VALUE = 4
+
+BOT_THROW_CARD_WAIT_TIME = 2
 
 @server.socketio.on('connect')
 def test_connect():
@@ -218,6 +221,7 @@ def trigger_card_thrown_event(card_thrown: Card, player: Player, id):
     next_bot_player = game_list.games[id - 1].get_next_player()
     print(f'next_bot_player = {next_bot_player.name}')
     if isinstance(next_bot_player, Bot):
+        sleep(BOT_THROW_CARD_WAIT_TIME)
         card_thrown = next_bot_player.throw_card(next_bot_player.bot_get_random_card())
         print(f'Bot jogando: {next_bot_player.name} Carta jogando: {card_thrown.code}')
         trigger_card_thrown_event(card_thrown, next_bot_player, id)
