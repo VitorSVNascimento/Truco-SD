@@ -208,6 +208,7 @@ def trigger_card_thrown_event(card_thrown: Card, player: Player, id):
         return
     if isinstance(result,Player) or result == DRAW: 
         server.socketio.emit('throwed_card', {'username' : player.name, 'card' : card_thrown.to_json()}, to=id)
+        sleep(END_HAND_WAIT_TIME)
         server.socketio.emit('end_round',{'team':game_list.games[id -1].find_player_team(result).id if result != DRAW else DRAW,
                                             'new_order':game_list.games[id -1].player_order_to_json()['player_order']},to=id)
         [server.socketio.emit('your_cards',player.cards_to_json(),to=player.sid) for player in game_list.games[id - 1].player_order if not isinstance(player, Bot)]
