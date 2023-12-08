@@ -214,17 +214,17 @@ export default function gameRoom() {
 									{/* Placar da mão*/}
 									<div className="col-span-1 row-span-1 grid grid-rows-2 items-center justify-center font-mono text-xs font-semibold md:text-base 2xl:text-2xl">
 										<div className="row-span-1">Pontos da mão: </div>
-										<div className="row-span-1 grid grid-cols-3 rounded-lg bg-slate-50">
+										<div className="row-span-1 grid grid-cols-3">
 											<img
-												className="m-1 w-5 p-0 md:w-9 2xl:w-14 bg-slate-50 rounded-full"
+												className="m-1 w-5 p-0 md:w-9 2xl:w-14"
 												src={`${handPoints[0]}${POINT_IMAGE}`}
 											/>
 											<img
-												className="m-1 w-5 p-0 md:w-9 2xl:w-14 bg-slate-50 rounded-full"
+												className="m-1 w-5 p-0 md:w-9 2xl:w-14"
 												src={`${handPoints[1]}${POINT_IMAGE}`}
 											/>
 											<img
-												className="m-1 w-5 p-0 md:w-9 2xl:w-14 bg-slate-50 rounded-full"
+												className="m-1 w-5 p-0 md:w-9 2xl:w-14"
 												src={`${handPoints[2]}${POINT_IMAGE}`}
 											/>
 										</div>
