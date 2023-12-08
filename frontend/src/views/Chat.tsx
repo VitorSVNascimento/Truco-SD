@@ -5,9 +5,9 @@ import ChatMessageInput from "../components/chat/ChatMessageInput"
 import ChatMessages from "../components/chat/ChatMessages"
 import SocketContext from "../contexts/SocketContext"
 import { UserContext } from "../contexts/UserContext"
-import { playAudio } from "@/utils/utils"
+import { getRandomInt, playAudio } from "@/utils/utils"
 
-export default function Chat() {
+export default function Chat(props: { player?: any }) {
 	const [messages, setMessages] = useState<Message[]>([])
 	const messagesDivRef = useRef<HTMLDivElement>(null)
 	const socket = useContext(SocketContext)
@@ -16,10 +16,29 @@ export default function Chat() {
 	const [EASTER_EGG] = useState("Ao potência")
 
 	useEffect(() => {
-		console.log("user chat", user)
 		if (user === null) {
 			navigate("/")
 		}
+
+		socket.on("end_hand", (data) => {
+			let isHandWinner = false
+			if (data["winner"] == props.player.team) isHandWinner = true
+
+			const message = {
+				id: getRandomInt(10000, 100000),
+				type: "end_hand",
+				text: "",
+				bgColor: "bg-orange-500",
+			}
+
+			if (isHandWinner) {
+				message.text = "Seu time venceu a mão!"
+			} else {
+				message.text = "O adversário venceu a mão!"
+			}
+
+			setMessages((prevMessages) => [...prevMessages, message])
+		})
 
 		socket.on("new_message", (message: Message) => {
 			console.log("new_message", message)
@@ -33,7 +52,8 @@ export default function Chat() {
 					})
 				}, 0)
 			}
-			if (message.text.toLowerCase() === EASTER_EGG.toLowerCase())
+
+			if (message.text?.toLowerCase() === EASTER_EGG.toLowerCase())
 				playAudio("sounds/ao-potencia.mp3")
 		})
 
@@ -44,6 +64,7 @@ export default function Chat() {
 		// Cleanup function to remove the event listeners when the component unmounts
 		return () => {
 			socket.off("new_message")
+			socket.off("end_hand")
 		}
 	}, [])
 

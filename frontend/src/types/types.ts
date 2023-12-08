@@ -1,8 +1,10 @@
 export interface Message {
-    id: number,
-    text: string,
-    userId: string,
-    userName: string
+    id?: number,
+    text?: string,
+    userId?: string,
+    userName?: string,
+    type: string,
+    bgColor?: string,
 }
 
 export interface User {

@@ -10,7 +10,6 @@ import {
 	DialogHeader,
 	DialogTitle,
 	DialogTrigger,
-	DialogClose,
 } from "@/components/ui/dialog"
 import GameRoomPlayer from "../components/gameRoom/GameRoomPlayer"
 
@@ -37,8 +36,6 @@ export default function gameRoom() {
 	const [PLAYER_POSITION_LEFT] = useState(3)
 	const [handValue, setHandValue] = useState(2)
 	const [proposedHandValue, setProposedHandValue] = useState(2)
-	const [showModalEndHand, setShowModalEndHand] = useState(false)
-	const [isHandWinner, setIsHandWinner] = useState(false)
 	const [NULL_POINT] = useState(0)
 	const [TEAM_POINT] = useState(1)
 	const [OPPONENT_POINT] = useState(2)
@@ -105,8 +102,8 @@ export default function gameRoom() {
 	}
 
 	const updateRoundPoints = (index: number, newValue: number) => {
-		const newArray = handPoints.map((value, i) => (index === -1 || index === i) ? newValue : value);
-		setHandPoints(newArray);
+		const newArray = handPoints.map((value, i) => (index === -1 || index === i ? newValue : value))
+		setHandPoints(newArray)
 	}
 
 	useEffect(() => {
@@ -146,9 +143,6 @@ export default function gameRoom() {
 
 		socket.on("end_hand", (data) => {
 			console.log("end_hand", data)
-			if (data["winner"] == player.team) setIsHandWinner(true)
-			else setIsHandWinner(false)
-			setShowModalEndHand(true)
 			setWaitingPartnerTruco(false)
 			// eslint-disable-next-line camelcase
 			setRoundOrder(data.new_order)
@@ -193,7 +187,7 @@ export default function gameRoom() {
 			setRoundOrder(data.new_order)
 			reorganizeTableOrder()
 			setTurn(0)
-			updateRoundPoints(round, (data.team == player.team) ? TEAM_POINT : OPPONENT_POINT)
+			updateRoundPoints(round, data.team == player.team ? TEAM_POINT : OPPONENT_POINT)
 			setRound(round + 1)
 		})
 
@@ -217,9 +211,9 @@ export default function gameRoom() {
 							<div className="row-span-1 items-center justify-center">
 								<div className="grid h-full grid-cols-3">
 									{/* Placar da mão*/}
-									<div className="col-span-1 grid grid-rows-2 items-center justify-center text-xs 2xl:text-2xl row-span-1 font-mono font-semibold md:text-base">
+									<div className="col-span-1 row-span-1 grid grid-rows-2 items-center justify-center font-mono text-xs font-semibold md:text-base 2xl:text-2xl">
 										<div className="row-span-1">Pontos da mão: </div>
-										<div className="row-span-1 grid grid-cols-3 bg-slate-50 rounded-lg">
+										<div className="row-span-1 grid grid-cols-3 rounded-lg bg-slate-50">
 											<img
 												className="m-1 w-5 p-0 md:w-9 2xl:w-14"
 												src={`${handPoints[0]}${POINT_IMAGE}`}
@@ -361,10 +355,14 @@ export default function gameRoom() {
 											<div className="row-span-1 truncate font-mono text-2xl font-semibold capitalize antialiased md:text-4xl">
 												{player?.name}
 											</div>
-											<div className="text-xs row-span-1 font-mono font-semibold antialiased md:text-base">
+											<div className="row-span-1 font-mono text-xs font-semibold antialiased md:text-base">
 												Time {player?.team}
 											</div>
-											<div className={`text-1xl row-span-1 font-mono font-semibold antialiased md:text-2xl ${myTurn ? "" : "opacity-0"}`}>
+											<div
+												className={`text-1xl row-span-1 font-mono font-semibold antialiased md:text-2xl ${
+													myTurn ? "" : "opacity-0"
+												}`}
+											>
 												Seu turno!
 											</div>
 										</div>
@@ -379,7 +377,7 @@ export default function gameRoom() {
 				id="chat"
 				className="absolute left-0 top-0 hidden w-full md:relative md:col-span-1 md:block md:opacity-100"
 			>
-				<Chat />
+				<Chat player={player} />
 			</div>
 			<button
 				id="toggleChatButton"
@@ -453,31 +451,6 @@ export default function gameRoom() {
 					</DialogHeader>
 					<div className="grid gap-4 py-4 text-slate-300">
 						Aguardando parceiro responder pedido de truco...
-					</div>
-				</DialogContent>
-			</Dialog>
-			<Dialog open={showModalEndHand} onOpenChange={setShowModalEndHand}>
-				<DialogContent className="bg-slate-700 sm:max-w-[425px]">
-					<DialogHeader className="relative text-slate-100">
-						<DialogTitle>Mão Finalizada</DialogTitle>
-						<DialogClose asChild>
-							<button className="absolute right-0 top-0 m-0 mb-1" type="button">
-								<Icon>close</Icon>
-							</button>
-						</DialogClose>
-					</DialogHeader>
-					<div className="grid gap-1 py-4 text-slate-300">
-						<div>A mão foi finalizada.</div>
-						<div>
-							{(() => {
-								switch (isHandWinner) {
-									case true:
-										return "Seu time venceu esta mão."
-									case false:
-										return "O time adversário venceu esta mão."
-								}
-							})()}
-						</div>
 					</div>
 				</DialogContent>
 			</Dialog>
