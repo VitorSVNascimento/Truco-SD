@@ -185,6 +185,7 @@ export default function gameRoom() {
 			setTableOrder(updateTableData(data))
 			setTurn(turn + 1)
 			playAudio(`sounds/${Math.floor(Math.random() * 2)}-flip.mp3`)
+			console.log("throwed card" , data)
 		})
 
 		socket.on("end_round", (data) => {
