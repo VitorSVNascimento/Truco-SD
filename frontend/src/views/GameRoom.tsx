@@ -18,6 +18,7 @@ export default function gameRoom() {
 	const location = useLocation()
 	const { props } = location.state || {}
 	const [cards, setCards] = useState(props?.cards)
+	const [partnerCards, setPartnerCards] = useState([])
 	const [player] = useState(props?.player)
 	const [players] = useState(props?.players)
 	const [roundOrder, setRoundOrder] = useState(props?.roundOrder)
@@ -51,6 +52,7 @@ export default function gameRoom() {
 		event: "",
 		data: {},
 	})
+	const [showTenHandDialog, setShowTenHandDialog] = useState(false)
 
 	const toggleChat = () => {
 		const chat = document.querySelector("#chat")
@@ -124,6 +126,14 @@ export default function gameRoom() {
 		setHandPoints(newArray)
 	}
 
+	const acceptTenHand = () => {
+		socket.emit("accept_ten_hand")
+	}
+
+	const declineTenHand = () => {
+		socket.emit("decline_ten_hand")
+	}
+
 	useEffect(() => {
 		resetTableOrder()
 	}, [])
@@ -144,8 +154,8 @@ export default function gameRoom() {
 		socket.on("accepted_truco", (data) => {
 			console.log("accepted_truco", data)
 
+			setHandValue(data["new_hand_value"])
 			if (waitingAcceptTruco) {
-				setHandValue(data["new_hand_value"])
 				setWaitingAcceptTruco(false)
 
 				const event = {
@@ -278,12 +288,32 @@ export default function gameRoom() {
 			}
 		})
 
+		socket.on("ten_hand", (data) => {
+			console.log("ten_hand", data, socket.id)
+			setShowTenHandDialog(true)
+			setPartnerCards(data["partner_cards"])
+		})
+
+		socket.on("accepted_ten_hand", (data) => {
+			console.log("accepted_ten_hand", data)
+			setShowTenHandDialog(false)
+		})
+
+		socket.on("declined_ten_hand", (data) => {
+			console.log("declined_ten_hand", data)
+			setShowTenHandDialog(false)
+		})
+
 		return () => {
 			socket.off("receive_truco")
 			socket.off("accepted_truco")
 			socket.off("declined_truco")
 			socket.off("your_cards")
 			socket.off("end_hand")
+			socket.off("waiting_truco")
+			socket.off("ten_hand")
+			socket.off("accepted_ten_hand")
+			socket.off("declined_ten_hand")
 		}
 	}, [waitingAcceptTruco, handValue, teamPoints])
 
@@ -301,7 +331,10 @@ export default function gameRoom() {
 			setRoundOrder(data.new_order)
 			roundResetTableOrder()
 			setTurn(0)
-			updateRoundPoints(round, (data.team == player.team) ? TEAM_POINT : ((data.team == 3) ? DRAW_POINT : OPPONENT_POINT))
+			updateRoundPoints(
+				round,
+				data.team == player.team ? TEAM_POINT : data.team == 3 ? DRAW_POINT : OPPONENT_POINT,
+			)
 			setRound(round + 1)
 		})
 
@@ -309,10 +342,10 @@ export default function gameRoom() {
 			socket.off("throwed_card")
 			socket.off("end_round")
 		}
-	}, [cards, tableOrder])
+	}, [cards, tableOrder, roundOrder, turn])
 
-	useEffect(() => {         
-		setMyTurn(roundOrder.length > 0 && player.name === roundOrder[turn])     
+	useEffect(() => {
+		setMyTurn(roundOrder.length > 0 && player.name === roundOrder[turn])
 	}, [turn, roundOrder])
 
 	return (
@@ -449,9 +482,9 @@ export default function gameRoom() {
 													className="flex rounded-full bg-blue-500 p-3 text-gray-50 shadow-sm focus-within:bg-red-700 focus-within:outline hover:bg-red-600 disabled:bg-gray-500"
 													type="button"
 													onClick={callTruco}
-													disabled={!myTurn || waitingAcceptTruco}
+													disabled={!myTurn || waitingAcceptTruco || handValue >= 10}
 												>
-													TRUUUUUUUCO
+													TRUUUUUUUCO {handValue}
 												</button>
 											</DialogTrigger>
 											<DialogContent className="bg-slate-700 sm:max-w-[425px]">
@@ -589,6 +622,46 @@ export default function gameRoom() {
 					</DialogHeader>
 					<div className="grid gap-4 py-4 text-slate-300">
 						Aguardando parceiro responder pedido de truco...
+					</div>
+				</DialogContent>
+			</Dialog>
+			<Dialog open={showTenHandDialog}>
+				<DialogContent className="bg-slate-700 sm:max-w-[425px]">
+					<DialogHeader>
+						<DialogTitle className="text-slate-100">Mão de 10</DialogTitle>
+					</DialogHeader>
+					<div className="flex flex-col gap-3 py-4 text-slate-300">
+						<div>
+							Suas Cartas:
+							<div className="row-span-1 flex items-center justify-center">
+								{cards?.map((c: { code: null | undefined; url_image: string }) => (
+									<div key={c.code}>
+										<img className="img-responsive" src={c.url_image} />
+									</div>
+								))}
+							</div>
+						</div>
+						<div>
+							Cartas do parceiro:
+							<div className="row-span-1 flex items-center justify-center">
+								{partnerCards?.map((c: { code: null | undefined; url_image: string }) => (
+									<div key={c.code}>
+										<img className="img-responsive" src={c.url_image} />
+									</div>
+								))}
+							</div>
+						</div>
+						<div className="flex gap-3">
+							<button
+								className="rounded-md bg-green-500 p-2 text-slate-100"
+								onClick={acceptTenHand}
+							>
+								Jogar
+							</button>
+							<button className="rounded-md bg-red-500 p-2 text-slate-100" onClick={declineTenHand}>
+								Correr
+							</button>
+						</div>
 					</div>
 				</DialogContent>
 			</Dialog>
