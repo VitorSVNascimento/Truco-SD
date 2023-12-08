@@ -139,9 +139,9 @@ export default function gameRoom() {
 			setWaitingPartnerTruco(false)
 		})
 
-		socket.on("your_cards", (cards: any) => {
-			console.log("your_cards", cards)
-			// setCards(cards)
+		socket.on("your_cards", (data: any) => {
+			console.log("your_cards", data)
+			setCards(data.cards)
 		})
 
 		socket.on("end_hand", (data) => {
@@ -153,6 +153,8 @@ export default function gameRoom() {
 			// eslint-disable-next-line camelcase
 			setRoundOrder(data.new_order)
 			setTurn(0)
+			updateRoundPoints(-1, NULL_POINT)
+			setRound(0)
 			playAudio("sounds/shufflingCards.wav")
 		})
 
@@ -215,19 +217,19 @@ export default function gameRoom() {
 							<div className="row-span-1 items-center justify-center">
 								<div className="grid h-full grid-cols-3">
 									{/* Placar da mão*/}
-									<div className="col-span-1 grid grid-rows-2 items-center justify-center text-xs row-span-1 font-mono font-semibold md:text-base">
+									<div className="col-span-1 grid grid-rows-2 items-center justify-center text-xs 2xl:text-2xl row-span-1 font-mono font-semibold md:text-base">
 										<div className="row-span-1">Pontos da mão: </div>
 										<div className="row-span-1 grid grid-cols-3 bg-slate-50 rounded-lg">
 											<img
-												className="m-1 w-5 p-0 md:w-9 2xl:w-20"
+												className="m-1 w-5 p-0 md:w-9 2xl:w-14"
 												src={`${handPoints[0]}${POINT_IMAGE}`}
 											/>
 											<img
-												className="m-1 w-5 p-0 md:w-9 2xl:w-20"
+												className="m-1 w-5 p-0 md:w-9 2xl:w-14"
 												src={`${handPoints[1]}${POINT_IMAGE}`}
 											/>
 											<img
-												className="m-1 w-5 p-0 md:w-9 2xl:w-20"
+												className="m-1 w-5 p-0 md:w-9 2xl:w-14"
 												src={`${handPoints[2]}${POINT_IMAGE}`}
 											/>
 										</div>
