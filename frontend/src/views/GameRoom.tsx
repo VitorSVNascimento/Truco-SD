@@ -94,7 +94,7 @@ export default function gameRoom() {
 		setTableOrder(newArray)
 	}
 
-	const updateTableData = (newData: any) => {
+	const updateTableOrder = (newData: any) => {
 		return tableOrder?.map((player) => {
 			if (player.name === newData.username) {
 				return {
@@ -107,7 +107,7 @@ export default function gameRoom() {
 		})
 	}
 
-	const roundResetTableData = () => {
+	const roundResetTableOrder = () => {
 		setTableOrder(tableOrder?.map((player) => {
 			return {
 				...player,
@@ -275,7 +275,7 @@ export default function gameRoom() {
 
 	useEffect(() => {
 		socket.on("throwed_card", (data) => {
-			setTableOrder(updateTableData(data))
+			setTableOrder(updateTableOrder(data))
 			setTurn(turn + 1)
 			playAudio(`sounds/${Math.floor(Math.random() * 2)}-flip.mp3`)
 			console.log("throwed card", data)
@@ -285,7 +285,7 @@ export default function gameRoom() {
 			console.log("end_round", data)
 			// eslint-disable-next-line camelcase
 			setRoundOrder(data.new_order)
-			roundResetTableData()
+			roundResetTableOrder()
 			setTurn(0)
 			updateRoundPoints(round, (data.team == player.team) ? TEAM_POINT : ((data.team == 3) ? DRAW_POINT : OPPONENT_POINT))
 			setRound(round + 1)
