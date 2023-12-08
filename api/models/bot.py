@@ -2,6 +2,7 @@ import random
 from models.player import Player
 from models.card import Card
 from typing import List
+from constants.call_truco_constants import ACCEPT,DECLINE
 
 BOT_NAMES = [
     "BOT Zé Da Cerveja",
@@ -22,6 +23,12 @@ class Bot(Player):
     def __init__(self, id: int, name: str, cards: List[Card] = []):
         super().__init__(id, name, None, cards)
 
+    def bot_get_random_card(self) -> Card:
+        return random.choice(self.cards)
+    
+    def bot_get_response_truco(self) -> int:
+        return random.choice([DECLINE])
+    
     # To Do
     def bot_throw_card(self, card: Card) -> Card:
         """
@@ -29,7 +36,6 @@ class Bot(Player):
         :param card: Um objeto da classe 'Card' a ser removido da mão do jogador.
         :return: O objeto 'Card' que foi removido da mão do jogador.
         """
-
         return self.throw_card_using_code(card.code)
     
     @staticmethod

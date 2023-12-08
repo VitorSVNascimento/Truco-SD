@@ -55,8 +55,6 @@ class Hand:
                 self.clear_table()
                 return hand_result
 
-
-        
             result = [value for value in self.hand_winners if value != DRAW]
             hand_result = HandResult(result[0],self.hand_value,self.table_cards[0][1]['player'])
             self.clear_table()
@@ -87,6 +85,7 @@ class Hand:
         return max_weight_positions
 
     def get_current_round_winner(self):
+        print(f'table_cards_size = {len(self.table_cards[self.round])}')
         if len(self.table_cards[self.round]) < TOTAL_PLAYERS:
             return None
         
@@ -134,7 +133,7 @@ class Hand:
             return WAITING
         if len(self.truco_responses) == 1:
             return ACCEPT
-        if self.truco_responses[0]['response'] == ACCEPT and self.truco_responses[1]['response'] == ACCEPT:
+        if self.truco_responses[0]['response'] == ACCEPT or self.truco_responses[1]['response'] == ACCEPT:
             self.truco_responses = []
             return ACCEPT
         self.truco_responses = []
