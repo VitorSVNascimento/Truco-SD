@@ -29,7 +29,6 @@ class Bot(Player):
     def bot_get_response_truco(self) -> int:
         return random.choice([DECLINE])
     
-    # To Do
     def bot_throw_card(self, card: Card) -> Card:
         """
         Remove uma carta da mão do bot com base nos dados do jogo.
