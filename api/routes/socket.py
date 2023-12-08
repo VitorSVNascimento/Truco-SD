@@ -23,6 +23,7 @@ TEN_HAND = 10
 TEN_HAND_VALUE = 4
 
 BOT_THROW_CARD_WAIT_TIME = 2
+END_HAND_WAIT_TIME = 2
 
 @server.socketio.on('connect')
 def test_connect():
@@ -184,6 +185,7 @@ def trigger_truco_response_event(player: Player, result, hand_result, response, 
 
 
 def end_hand(result:HandResult,id:int):
+    sleep(END_HAND_WAIT_TIME)
     server.socketio.emit('end_hand',{'new_order':game_list.games[id -1].player_order_to_json()['player_order'],
                                                  'game_score':game_list.games[id -1].get_score(),'overall_score':game_list.games[id -1].get_games_won(),'winner':result.team_winner.id},to=id)
     [server.socketio.emit('your_cards',player.cards_to_json(),to=player.sid) for player in game_list.games[id - 1].player_order if not isinstance(player, Bot)]
