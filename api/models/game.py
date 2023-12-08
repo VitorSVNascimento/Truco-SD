@@ -71,6 +71,8 @@ class Game:
         
         self.started = True
 
+    def get_next_player(self):
+        return self.player_order[FIRST_PLAYER]
         
     def get_player_sid(self,sid) -> Player:
         for team in self.teams:
@@ -204,7 +206,9 @@ class Game:
         self.player_order.pop(0)
 
         winner = self.current_hand.get_current_round_winner()
-        if winner != None:
+        if winner is not None:
+            print(f'winner = {winner.name}')
+        if winner is not None:
             #Alguém venceu o round
             hand_result : HandResult = self.current_hand.get_winner()
             if hand_result.team_winner != None:
@@ -220,6 +224,7 @@ class Game:
             if team_winner == DRAW:
                 return team_winner
             return winner
+        print(f'Ordem: {[player.name for player in self.player_order]}')
         return messages_json[SUCCESS]
 
     def find_player_team(self, player:Player) -> Team:
@@ -275,7 +280,7 @@ class Game:
             if response == ACCEPT:
                 self.current_hand.buff_hand_value()
             else:
-                next_player = self.get_next_player()
+                next_player = self.get_next_hand_player()
                 hand_result = HandResult(self.team_opponent(self.find_player_team(player)),self.current_hand.hand_value,next_player)
                 self.end_hand(hand_result)
         return response,hand_result
@@ -290,10 +295,11 @@ class Game:
             self.team_opponent(team).score = 0
         self.__define_player_order_by_last_winner(hand_result.next_player.name)
         [player.cards.clear() for player in self.player_order]
+        self.current_hand.clear_table()
         self.__create_players_piles(self.deck['deck_id'], self.player_order)
         return hand_result
     
-    def get_next_player(self,) -> Player:
+    def get_next_hand_player(self,) -> Player:
         next_player = self.current_hand.get_next_player()
         if next_player == None:
             next_player = self.player_order[1] if len(self.player_order) == 4 else self.player_order[0]
@@ -302,7 +308,7 @@ class Game:
     def decline_ten_hand(self,player:Player):
         team = self.find_player_team(player)
         opponent = self.team_opponent(team)
-        next_player = self.get_next_player()
+        next_player = self.get_next_hand_player()
         hand_result = HandResult(opponent,self.current_hand.hand_value,next_player)
         self.end_hand(hand_result)
         return hand_result

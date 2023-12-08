@@ -8,6 +8,7 @@ from models.hand import DRAW
 from models.player import Player
 from models.hand_resullt import HandResult
 from models.card import Card
+from models.bot import Bot
 
 messageCount = 0
 players = []
@@ -92,7 +93,7 @@ def start():
     id = game_list.sids[request.sid]
     if request.sid == game_list.games[id - 1].owner.sid:
         game_list.games[id - 1].start()
-        [server.socketio.emit('your_cards',{"username": player.name, "cards": player.cards_to_json()["cards"], "round_order": game_list.games[id - 1].player_order_to_json()},to=player.sid) for player in game_list.games[id - 1].player_order if not player.name.startswith('BOT')]
+        [server.socketio.emit('your_cards',{"username": player.name, "cards": player.cards_to_json()["cards"], "round_order": game_list.games[id - 1].player_order_to_json()},to=player.sid) for player in game_list.games[id - 1].player_order if not isinstance(player, Bot)]
     else:
         server.socketio.emit(
         'room_message', f'Apenas o dono pode iniciar a partida', to=request.sid)
@@ -105,23 +106,10 @@ def throw(data):
     if player.sid != request.sid:
         server.socketio.emit(
         'room_message', f'Não é sua vez de jogar', to=request.sid)    
-        return   
-       
-    card = Card(card_code)
-    result = game_list.games[id -1].throw_card(card,player.name)
-    if isinstance(result,HandResult):
-        server.socketio.emit('throwed_card',{'username' : player.name,'card':card.to_json()},to=id)
-        end_hand(result,id)
-        return
-    if isinstance(result,Player) or result == DRAW: 
-        server.socketio.emit('throwed_card', {'username' : player.name, 'card' : card.to_json()}, to=id)
-        server.socketio.emit('end_round',{'team':game_list.games[id -1].find_player_team(result).id if result != DRAW else DRAW,
-                                            'new_order':game_list.games[id -1].player_order_to_json()['player_order']},to=id)
-        [server.socketio.emit('your_cards',player.cards_to_json(),to=player.sid) for player in game_list.games[id - 1].player_order if not player.name.startswith('BOT')]
         return
 
-    server.socketio.emit('throwed_card', {'username' : player.name, 'card' : card.to_json()}, to=id)
-            
+    card = Card(card_code)
+    trigger_card_thrown_event(card, player, id)
 
 @server.socketio.on('send message')
 def send_room_message(data):
@@ -149,9 +137,19 @@ def call_truco():
     print('Chegou no call_truco!')
     id = game_list.sids[request.sid]
     player = game_list.games[id - 1].get_player_sid(request.sid)
-    team = game_list.games[id-1].call_truco(player)
+    team_calling_truco = game_list.games[id-1].call_truco(player)
 
-    server.socketio.emit('receive_truco',{'username': player.name,'team':team.id,'proposed_value':VALUES_HAND_BUFF_JSON[game_list.games[id - 1].current_hand.hand_value]},to=id)
+    server.socketio.emit('receive_truco',{'username': player.name,'team':team_calling_truco.id,'proposed_value':VALUES_HAND_BUFF_JSON[game_list.games[id - 1].current_hand.hand_value]},to=id)
+
+    for team in game_list.games[id-1].teams:
+        if team.id != team_calling_truco.id:
+            for player_analizing_truco in team.players:
+                if isinstance(player_analizing_truco, Bot):
+                    if not game_list.games[id - 1].current_hand.waiting_truco:
+                        return
+                    result,hand_result = game_list.games[id - 1].truco_response(player_analizing_truco.bot_get_response_truco(), player_analizing_truco)
+                    trigger_truco_response_event(player_analizing_truco,result, hand_result, player_analizing_truco.bot_get_response_truco(), id)
+
 
 @server.socketio.on('accept_truco')
 def accept_truco():
@@ -167,7 +165,10 @@ def response_truco(response:int,sid):
     id = game_list.sids[sid]
     player = game_list.games[id - 1].get_player_sid(sid)
     result,hand_result = game_list.games[id -1].truco_response(response, player)
+    trigger_truco_response_event(player,result,hand_result,response, id)
 
+
+def trigger_truco_response_event(player: Player, result, hand_result, response, id):
     if result == ACCEPT:
         print('entrou')
         server.socketio.emit('accepted_truco', {'username':player.name,'new_hand_value':game_list.games[id - 1].current_hand.hand_value}, to=id)
@@ -178,18 +179,55 @@ def response_truco(response:int,sid):
         return
     server.socketio.emit('waiting_truco',{'username':player.name,'response':response},to=id)
 
+
 def end_hand(result:HandResult,id:int):
     server.socketio.emit('end_hand',{'new_order':game_list.games[id -1].player_order_to_json()['player_order'],
                                                  'game_score':game_list.games[id -1].get_score(),'overall_score':game_list.games[id -1].get_games_won(),'winner':result.team_winner.id},to=id)
-    [server.socketio.emit('your_cards',player.cards_to_json(),to=player.sid) for player in game_list.games[id - 1].player_order if not player.name.startswith('BOT')]   
-    check_ten_hand(id)
+    [server.socketio.emit('your_cards',player.cards_to_json(),to=player.sid) for player in game_list.games[id - 1].player_order if not isinstance(player, Bot)]
+    ten_hand = is_ten_hand(id)
+    if not ten_hand:
+        next_bot_player = game_list.games[id - 1].get_next_player()
+        print(f'next_bot_player = {next_bot_player.name}')
+        if isinstance(next_bot_player, Bot):
+            card_thrown = next_bot_player.throw_card(next_bot_player.bot_get_random_card())
+            print(f'Bot jogando: {next_bot_player.name} Carta jogando: {card_thrown.code}')
+            trigger_card_thrown_event(card_thrown, next_bot_player, id) 
+
+    
+
+def trigger_card_thrown_event(card_thrown: Card, player: Player, id):
+    result = game_list.games[id -1].throw_card(card_thrown,player.name)
+    if isinstance(result,HandResult):
+        server.socketio.emit('throwed_card',{'username' : player.name,'card':card_thrown.to_json()},to=id)
+        end_hand(result,id)
+        return
+    if isinstance(result,Player) or result == DRAW: 
+        server.socketio.emit('throwed_card', {'username' : player.name, 'card' : card_thrown.to_json()}, to=id)
+        server.socketio.emit('end_round',{'team':game_list.games[id -1].find_player_team(result).id if result != DRAW else DRAW,
+                                            'new_order':game_list.games[id -1].player_order_to_json()['player_order']},to=id)
+        [server.socketio.emit('your_cards',player.cards_to_json(),to=player.sid) for player in game_list.games[id - 1].player_order if not isinstance(player, Bot)]
+        next_bot_player = game_list.games[id - 1].get_next_player()
+        print(f'next_bot_player = {next_bot_player.name}')
+        if isinstance(next_bot_player, Bot):
+            card_thrown = next_bot_player.throw_card(next_bot_player.bot_get_random_card())
+            print(f'Bot jogando: {next_bot_player.name} Carta jogando: {card_thrown.code}')
+            trigger_card_thrown_event(card_thrown, next_bot_player, id)
+        return
+    server.socketio.emit('throwed_card', {'username' : player.name, 'card' : card_thrown.to_json()}, to=id)
+
+    next_bot_player = game_list.games[id - 1].get_next_player()
+    print(f'next_bot_player = {next_bot_player.name}')
+    if isinstance(next_bot_player, Bot):
+        card_thrown = next_bot_player.throw_card(next_bot_player.bot_get_random_card())
+        print(f'Bot jogando: {next_bot_player.name} Carta jogando: {card_thrown.code}')
+        trigger_card_thrown_event(card_thrown, next_bot_player, id)
    
 
 @server.socketio.on('accept_ten_hand')
 def accept_ten_hand():
     print('accepted_ten_hand')
     id = game_list.sids[request.sid]
-    if  TEN_HAND not in game_list.games[id - 1].get_score():
+    if TEN_HAND not in game_list.games[id - 1].get_score():
         server.socketio.emit(
         'room_message', f'Não está na mão de 10', to=request.sid)    
         return
@@ -197,7 +235,14 @@ def accept_ten_hand():
     game_list.games[id - 1].current_hand.hand_value = TEN_HAND_VALUE
     player = game_list.games[id - 1].get_player_sid(request.sid)
     server.socketio.emit('accepted_ten_hand',{'username':player.name},to=id)
-    pass
+
+    next_bot_player = game_list.games[id - 1].get_next_player()
+    print(f'next_bot_player = {next_bot_player.name}')
+    if isinstance(next_bot_player, Bot):
+        card_thrown = next_bot_player.throw_card(next_bot_player.bot_get_random_card())
+        print(f'Bot jogando: {next_bot_player.name} Carta jogando: {card_thrown.code}')
+        trigger_card_thrown_event(card_thrown, next_bot_player, id)
+    
 
 @server.socketio.on('decline_ten_hand')
 def decline_ten_hand():
@@ -215,18 +260,19 @@ def decline_ten_hand():
     end_hand(hand_result,id)
     pass
 
-def check_ten_hand(id:int):
+def is_ten_hand(id:int):
     game = game_list.games[id - 1]
     print('aou potencia')
     print(game.get_score)
     print(game.get_score().count(TEN_HAND))
     if TEN_HAND not in game.get_score() or game.get_score().count(TEN_HAND) == 2:
         print('TA NO IF')
-        return
+        return False
     team_on_ten_hand =  game.teams[game.get_score().index(TEN_HAND)] 
     print('entrou NO TEN HAND')
     if game_list.games[id -1].player_order.index(team_on_ten_hand.players[0]) < game_list.games[id -1].player_order.index(team_on_ten_hand.players[1]):
-        server.socketio.emit('ten_hand',{'partner_cards':team_on_ten_hand.players[1].cards_to_json()['cards']},to=team_on_ten_hand.players[0].sid) 
+        server.socketio.emit('ten_hand',{'partner_cards':team_on_ten_hand.players[1].cards_to_json()['cards']},to=team_on_ten_hand.players[0].sid)
     else:
-        server.socketio.emit('ten_hand',{'partner_cards':team_on_ten_hand.players[0].cards_to_json()['cards']},to=team_on_ten_hand.players[1].sid) 
+        server.socketio.emit('ten_hand',{'partner_cards':team_on_ten_hand.players[0].cards_to_json()['cards']},to=team_on_ten_hand.players[1].sid)
+    return True
 
