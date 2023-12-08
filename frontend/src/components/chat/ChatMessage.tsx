@@ -15,11 +15,17 @@ export default function ChatMessage(props: { message: Message }) {
 
 	return (
 		<div
-			className={`my-0.5 flex w-fit flex-col rounded-md p-2 ${
-				props.message.userId === user!.id ? "self-end bg-blue-600" : "bg-blue-400"
+			className={`my-0.5 flex flex-col rounded-md p-2 ${
+				props.message.userId
+					? props.message.userId === user!.id
+						? "w-fit self-end bg-blue-600"
+						: "w-fit bg-blue-400"
+					: `${props.message.bgColor} text-center opacity-100 shadow`
 			}`}
 		>
-			<div className="font-bold capitalize">{props.message.userName}:</div>
+			{props.message.userName && (
+				<div className="font-bold capitalize">{props.message.userName}:</div>
+			)}
 			<div>{props.message.text}</div>
 		</div>
 	)
