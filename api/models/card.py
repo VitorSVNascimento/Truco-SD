@@ -21,6 +21,8 @@ VALID_CARD_CODES = [
     'AH', '2H', '3H', '4H', '5H', '6H', '7H', 'JH', 'QH', 'KH'
 ]
 
+SPECIAL_CARDS_START_WEIGHT = 11
+
 SUITS = {'S': 'SPADES', 'D': 'DIAMONDS', 'H': 'HEARTS', 'C': 'CLUBS'}
 
 class Card:
