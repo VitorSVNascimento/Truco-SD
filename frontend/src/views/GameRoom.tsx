@@ -247,7 +247,7 @@ export default function gameRoom() {
 			setCards(data.cards)
 		})
 
-		socket.on("end_hand", (data) => {
+		socket.on("end_hand", (data: any) => {
 			console.log("end_hand", data)
 
 			let isHandWinner = false
@@ -269,22 +269,27 @@ export default function gameRoom() {
 
 			setTeamPoints(
 				teamPoints?.map((team) => {
+					const currentIndex = team.id - 1
 					if (team.id == data["winner"]) {
-						return {
-							...team,
-							points: team.points + roundValue,
-						}
+						team.points = data["game_score"][currentIndex]
+						console.log({ team })
+						return team
 					}
 					return team
 				}),
 			)
+
+			console.log("teamPoints", teamPoints)
 
 			setChatEvent(event)
 			setTimeout(() => {
 				setChatEvent({ event: "", data: {} })
 			}, 1000)
 
-			if (data["game_score"][0] == 0 && data["game_score"][0] == 0) {
+			if (data["game_score"][0] == 0 && data["game_score"][1] == 0) {
+				if (teamPoints.some((team: any) => team.points == 0)) {
+					playAudio("sounds/ao-potencia.mp3")
+				}
 				resetGlobalScore(data["overall_score"])
 			}
 
@@ -323,6 +328,7 @@ export default function gameRoom() {
 		socket.on("accepted_ten_hand", (data) => {
 			console.log("accepted_ten_hand", data)
 			setShowTenHandDialog(false)
+			setRoundValue(4)
 		})
 
 		socket.on("declined_ten_hand", (data) => {
@@ -681,7 +687,7 @@ export default function gameRoom() {
 					<DialogHeader>
 						<DialogTitle className="text-slate-100">Mão de 10</DialogTitle>
 					</DialogHeader>
-					<div className="flex flex-col gap-1 text-slate-300">
+					<div className="flex flex-col gap-3 text-slate-300">
 						<div>
 							Suas Cartas:
 							<div className="row-span-1 flex items-center justify-center">
