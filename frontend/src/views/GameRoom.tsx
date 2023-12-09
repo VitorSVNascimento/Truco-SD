@@ -39,7 +39,10 @@ export default function gameRoom() {
 	const [handValue, setHandValue] = useState(2)
 	const [TEAM_1] = useState(0)
 	const [TEAM_2] = useState(1)
-	const [teamPoints, setTeamPoints] = useState<any[]>([{id: 1, points: 0, games: 0 }, {id: 2, points: 0, games: 0 }]);
+	const [teamPoints, setTeamPoints] = useState<any[]>([
+		{ id: 1, points: 0, games: 0 },
+		{ id: 2, points: 0, games: 0 },
+	])
 	const [proposedHandValue, setProposedHandValue] = useState(2)
 	const [NULL_POINT] = useState(0)
 	const [TEAM_POINT] = useState(1)
@@ -113,12 +116,14 @@ export default function gameRoom() {
 	}
 
 	const roundResetTableOrder = () => {
-		setTableOrder(tableOrder?.map((player) => {
-			return {
-				...player,
-				lastThrowedCardImg: CARD_PATTERN,
-			}
-		}))
+		setTableOrder(
+			tableOrder?.map((player) => {
+				return {
+					...player,
+					lastThrowedCardImg: CARD_PATTERN,
+				}
+			}),
+		)
 	}
 
 	const updateRoundPoints = (index: number, newValue: number) => {
@@ -247,16 +252,18 @@ export default function gameRoom() {
 			} else {
 				event.data.message = "O adversário venceu a mão!"
 			}
-			
-			setTeamPoints(teamPoints?.map((team) => {
-				if(team.id == data["winner"]) {
-					return {
-						...team,
-						points: team.points + handValue,
+
+			setTeamPoints(
+				teamPoints?.map((team) => {
+					if (team.id == data["winner"]) {
+						return {
+							...team,
+							points: team.points + handValue,
+						}
 					}
-				}
-				return team
-			}))
+					return team
+				}),
+			)
 
 			setChatEvent(event)
 			setTimeout(() => {
@@ -397,7 +404,9 @@ export default function gameRoom() {
 												<tr>
 													<td className="border pl-2 pr-2">Time 1</td>
 													<td className="border pl-2 pr-2">{teamPoints[TEAM_1]?.points}</td>
-													<td rowSpan={2} className="border pl-2 pr-2 text-2xl md:text-3xl">{handValue}</td>
+													<td rowSpan={2} className="border pl-2 pr-2 text-2xl md:text-3xl">
+														{handValue}
+													</td>
 													<td className="border pl-2 pr-2">{teamPoints[TEAM_1]?.games}</td>
 												</tr>
 												<tr>
@@ -491,7 +500,7 @@ export default function gameRoom() {
 												<DialogHeader>
 													<DialogTitle className="text-slate-100">Truco</DialogTitle>
 												</DialogHeader>
-												<div className="grid gap-4 py-4 text-slate-300">
+												<div className="grid gap-4 text-slate-300">
 													Aguardando jogadores adversários...
 												</div>
 											</DialogContent>
@@ -501,8 +510,10 @@ export default function gameRoom() {
 										{cards?.map(
 											(c: { code: null | undefined; url_image: string }, index: number) => (
 												<button
-													className={`mr-1 ml-1 w-14 md:w-28 ${
-														myTurn ? "md:transform md:transition-transform md:hover:translate-y-[-7px]" : ""
+													className={`ml-1 mr-1 w-14 md:w-28 ${
+														myTurn
+															? "md:transform md:transition-transform md:hover:translate-y-[-7px]"
+															: ""
 													} ${
 														!myTurn
 															? "opacity-80 grayscale"
@@ -563,7 +574,7 @@ export default function gameRoom() {
 					<DialogHeader>
 						<DialogTitle className="text-slate-100">Truco</DialogTitle>
 					</DialogHeader>
-					<div className="grid gap-4 py-4">
+					<div className="grid gap-4">
 						<div className="text-slate-300">
 							O time adversário pediu
 							{(() => {
@@ -620,7 +631,7 @@ export default function gameRoom() {
 					<DialogHeader>
 						<DialogTitle className="text-slate-100">Truco</DialogTitle>
 					</DialogHeader>
-					<div className="grid gap-4 py-4 text-slate-300">
+					<div className="grid gap-4 text-slate-300">
 						Aguardando parceiro responder pedido de truco...
 					</div>
 				</DialogContent>
@@ -630,7 +641,7 @@ export default function gameRoom() {
 					<DialogHeader>
 						<DialogTitle className="text-slate-100">Mão de 10</DialogTitle>
 					</DialogHeader>
-					<div className="flex flex-col gap-3 py-4 text-slate-300">
+					<div className="flex flex-col gap-3 text-slate-300">
 						<div>
 							Suas Cartas:
 							<div className="row-span-1 flex items-center justify-center">
