@@ -32,6 +32,9 @@ export default function gameRoom() {
 	const [turn, setTurn] = useState<number>(0)
 	const [myTurn, setMyTurn] = useState(roundOrder?.length > 0 && player?.name === roundOrder[turn])
 	const [TRICK_AUDIO] = useState(8)
+	const [SIX_AUDIO] = useState(1)
+	const [NINE_AUDIO] = useState(1)
+	const [TWELVE_AUDIO] = useState(1)
 	const [PLAYER_POSITION_BOTTOM] = useState(0)
 	const [PLAYER_POSITION_RIGHT] = useState(1)
 	const [PLAYER_POSITION_TOP] = useState(2)
@@ -73,7 +76,6 @@ export default function gameRoom() {
 
 	const callTruco = () => {
 		socket.emit("call_truco")
-		console.log("TRUCOOOOOOOOOO")
 		setPlayerCalledTrick(true)
 	}
 
@@ -160,7 +162,20 @@ export default function gameRoom() {
 	useEffect(() => {
 		socket.on("receive_truco", (data: any) => {
 			console.log("receive_truco", data)
-			playAudio(`sounds/truco-${Math.floor(Math.random() * TRICK_AUDIO)}.mp3`)
+			switch (data["proposed_value"]) {
+				case 4:
+					playAudio(`sounds/truco-${Math.floor(Math.random() * TRICK_AUDIO)}.mp3`)
+					break
+				case 8:
+					playAudio(`sounds/seis-${Math.floor(Math.random() * SIX_AUDIO)}.mp3`)
+					break
+				case 10:
+					playAudio(`sounds/nove-${Math.floor(Math.random() * NINE_AUDIO)}.mp3`)
+					break
+				case 12:
+					playAudio(`sounds/doze-${Math.floor(Math.random() * TWELVE_AUDIO)}.mp3`)
+					break
+			}
 			setPartnerTrucoResponse(0)
 			if (data.team == player.team) setWaitingAcceptTruco(true)
 			else {
@@ -272,14 +287,11 @@ export default function gameRoom() {
 					const currentIndex = team.id - 1
 					if (team.id == data["winner"]) {
 						team.points = data["game_score"][currentIndex]
-						console.log({ team })
 						return team
 					}
 					return team
 				}),
 			)
-
-			console.log("teamPoints", teamPoints)
 
 			setChatEvent(event)
 			setTimeout(() => {
