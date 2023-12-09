@@ -1,6 +1,6 @@
 import random
 from models.player import Player
-from models.card import Card
+from models.card import Card, SPECIAL_CARDS_START_WEIGHT
 from typing import List
 from constants.call_truco_constants import ACCEPT,DECLINE
 
@@ -27,9 +27,15 @@ class Bot(Player):
         return random.choice(self.cards)
     
     def bot_get_response_truco(self) -> int:
-        return random.choice([DECLINE])
+        return random.choice([ACCEPT,DECLINE])
     
-    # To Do
+    def bot_call_truco(self) -> bool:
+        for card in self.cards:
+            if card.weight >= SPECIAL_CARDS_START_WEIGHT:
+                return True
+        return False
+
+
     def bot_throw_card(self, card: Card) -> Card:
         """
         Remove uma carta da mão do bot com base nos dados do jogo.

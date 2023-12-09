@@ -1,5 +1,6 @@
 from typing import List
 from models.player import Player
+from models.bot import Bot
 
 ''' O número máximo de jogadores permitidos em um time. '''
 MAX_PLAYERS = 2
@@ -108,3 +109,19 @@ class Team:
             if player.name != partner.name:
                 return partner
         return
+    
+    def is_bot_on_team(self) -> True:
+        for player in self.players:
+            if isinstance(player, Bot):
+                return True
+        return False
+    
+    def is_team_of_bots(self) -> True:
+        return all(isinstance(player, Bot) for player in self.players)
+    
+    def get_bot_on_team(self) -> Bot:
+        for player in self.players:
+            if isinstance(player, Bot):
+                return player
+        return None
+    

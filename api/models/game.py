@@ -252,7 +252,7 @@ class Game:
                 if player.name == username:
                     return player
         return None
-    
+
     def get_score(self,):
         return [self.teams[TEAM_ONE -1].score,self.teams[TEAM_TWO -1].score]
     
