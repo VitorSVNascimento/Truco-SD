@@ -27,7 +27,7 @@ export default function gameRoom() {
 	const [waitingPartnerTruco, setWaitingPartnerTruco] = useState(false)
 	const [partnerTrucoResponse, setPartnerTrucoResponse] = useState(0)
 	const [trucoRequested, setTrucoRequested] = useState(false)
-	const [CARD_PATTERN] = useState("card-pattern.svg")
+	const [CARD_PATTERN] = useState("")
 	const [tableOrder, setTableOrder] = useState<any[]>([])
 	const [turn, setTurn] = useState<number>(0)
 	const [myTurn, setMyTurn] = useState(roundOrder?.length > 0 && player?.name === roundOrder[turn])
@@ -36,7 +36,7 @@ export default function gameRoom() {
 	const [PLAYER_POSITION_RIGHT] = useState(1)
 	const [PLAYER_POSITION_TOP] = useState(2)
 	const [PLAYER_POSITION_LEFT] = useState(3)
-	const [handValue, setHandValue] = useState(2)
+	const [roundValue, setRoundValue] = useState(2)
 	const [TEAM_1] = useState(0)
 	const [TEAM_2] = useState(1)
 	const [teamPoints, setTeamPoints] = useState<any[]>([
@@ -51,6 +51,7 @@ export default function gameRoom() {
 	const [POINT_IMAGE] = useState("-point.svg")
 	const [handPoints, setHandPoints] = useState<number[]>([NULL_POINT, NULL_POINT, NULL_POINT])
 	const [round, setRound] = useState(0)
+	const [playerCalledTrick, setPlayerCalledTrick] = useState(false)
 	const [chatEvent, setChatEvent] = useState<EventData>({
 		event: "",
 		data: {},
@@ -73,6 +74,7 @@ export default function gameRoom() {
 	const callTruco = () => {
 		socket.emit("call_truco")
 		console.log("TRUCOOOOOOOOOO")
+		setPlayerCalledTrick(true)
 	}
 
 	const acceptTruco = () => {
@@ -139,6 +141,18 @@ export default function gameRoom() {
 		socket.emit("decline_ten_hand")
 	}
 
+	const resetGlobalScore = (score: any[]) => {
+		setTeamPoints(
+			teamPoints?.map((team) => {
+				return {
+					...team,
+					points: 0,
+					games: score[team.id - 1],
+				}
+			}),
+		)
+	}
+
 	useEffect(() => {
 		resetTableOrder()
 	}, [])
@@ -159,7 +173,7 @@ export default function gameRoom() {
 		socket.on("accepted_truco", (data) => {
 			console.log("accepted_truco", data)
 
-			setHandValue(data["new_hand_value"])
+			setRoundValue(data["new_hand_value"])
 			if (waitingAcceptTruco) {
 				setWaitingAcceptTruco(false)
 
@@ -205,7 +219,7 @@ export default function gameRoom() {
 					},
 				}
 
-				switch (handValue) {
+				switch (roundValue) {
 					case 2:
 						event.data.message = "O adversário recusou o truco!"
 						break
@@ -258,7 +272,7 @@ export default function gameRoom() {
 					if (team.id == data["winner"]) {
 						return {
 							...team,
-							points: team.points + handValue,
+							points: team.points + roundValue,
 						}
 					}
 					return team
@@ -270,14 +284,19 @@ export default function gameRoom() {
 				setChatEvent({ event: "", data: {} })
 			}, 1000)
 
+			if (data["game_score"][0] == 0 && data["game_score"][0] == 0) {
+				resetGlobalScore(data["overall_score"])
+			}
+
 			setWaitingPartnerTruco(false)
 			// eslint-disable-next-line camelcase
 			setRoundOrder(data.new_order)
 			roundResetTableOrder()
 			setTurn(0)
+			setPlayerCalledTrick(false)
 			updateRoundPoints(-1, NULL_POINT)
 			setRound(0)
-			setHandValue(2)
+			setRoundValue(2)
 			playAudio("sounds/shufflingCards.wav")
 			resetTableOrder()
 		})
@@ -322,7 +341,7 @@ export default function gameRoom() {
 			socket.off("accepted_ten_hand")
 			socket.off("declined_ten_hand")
 		}
-	}, [waitingAcceptTruco, handValue, teamPoints])
+	}, [waitingAcceptTruco, roundValue, teamPoints])
 
 	useEffect(() => {
 		socket.on("throwed_card", (data) => {
@@ -338,6 +357,7 @@ export default function gameRoom() {
 			setRoundOrder(data.new_order)
 			roundResetTableOrder()
 			setTurn(0)
+			setPlayerCalledTrick(false)
 			updateRoundPoints(
 				round,
 				data.team == player.team ? TEAM_POINT : data.team == 3 ? DRAW_POINT : OPPONENT_POINT,
@@ -356,7 +376,7 @@ export default function gameRoom() {
 	}, [turn, roundOrder])
 
 	return (
-		<div className="min-h-screen bg-gradient-to-bl from-blue-700 via-blue-800 to-slate-700 text-white/90 md:grid md:grid-cols-5 md:content-normal md:gap-4 md:bg-white/90">
+		<div className="min-h-screen bg-green-700 text-white/90 md:grid md:grid-cols-5 md:content-normal md:gap-4">
 			<div className="md:col-span-4 md:justify-center">
 				<div className="m-0 grid h-full grid-rows-1 gap-2 p-2">
 					{/* Mesa */}
@@ -405,14 +425,14 @@ export default function gameRoom() {
 													<td className="border pl-2 pr-2">Time 1</td>
 													<td className="border pl-2 pr-2">{teamPoints[TEAM_1]?.points}</td>
 													<td rowSpan={2} className="border pl-2 pr-2 text-2xl md:text-3xl">
-														{handValue}
+														{roundValue}
 													</td>
 													<td className="border pl-2 pr-2">{teamPoints[TEAM_1]?.games}</td>
 												</tr>
 												<tr>
 													<td className="border pl-2 pr-2">Time 2</td>
 													<td className="border pl-2 pr-2">{teamPoints[TEAM_2]?.points}</td>
-													<td className="border pl-2 pr-2">{teamPoints[TEAM_2]?.points}</td>
+													<td className="border pl-2 pr-2">{teamPoints[TEAM_2]?.games}</td>
 												</tr>
 											</tbody>
 										</table>
@@ -430,7 +450,7 @@ export default function gameRoom() {
 											/>
 										)}
 									</div>
-									<div className="col-span-4 grid h-full grid-cols-3 rounded-full border-4 border-orange-400 bg-green-500">
+									<div className="col-span-4 grid h-full grid-cols-3 rounded-full border-4 border-orange-400 bg-yellow-400 bg-[url('/table.png')] bg-contain bg-center bg-no-repeat">
 										<div className="col-span-1 flex items-center justify-center">
 											{/* LEFT */}
 											{tableOrder.length > PLAYER_POSITION_LEFT && (
@@ -488,12 +508,32 @@ export default function gameRoom() {
 											<DialogTrigger asChild>
 												<button
 													id="trucoButton"
-													className="flex rounded-full bg-blue-500 p-3 text-gray-50 shadow-sm focus-within:bg-red-700 focus-within:outline hover:bg-red-600 disabled:bg-gray-500"
+													className="flex rounded-full bg-blue-500 p-3 text-gray-50 shadow-sm focus-within:bg-blue-700 focus-within:outline hover:bg-blue-600 disabled:bg-gray-500"
 													type="button"
 													onClick={callTruco}
-													disabled={!myTurn || waitingAcceptTruco || handValue >= 10}
+													disabled={
+														!myTurn ||
+														waitingAcceptTruco ||
+														roundValue > 10 ||
+														playerCalledTrick ||
+														teamPoints[TEAM_1]?.points >= 10 ||
+														teamPoints[TEAM_2]?.points >= 10
+													}
 												>
-													TRUUUUUUUCO {handValue}
+													{(() => {
+														switch (roundValue) {
+															case 2:
+																return "TRUUUUUUUCO"
+															case 4:
+																return "SEIS SÓ"
+															case 8:
+																return "VALE NOVE"
+															case 10:
+																return "DOZEE NELE!"
+															default:
+																return "Chega meu fi"
+														}
+													})()}
 												</button>
 											</DialogTrigger>
 											<DialogContent className="bg-slate-700 sm:max-w-[425px]">
@@ -641,14 +681,12 @@ export default function gameRoom() {
 					<DialogHeader>
 						<DialogTitle className="text-slate-100">Mão de 10</DialogTitle>
 					</DialogHeader>
-					<div className="flex flex-col gap-3 text-slate-300">
+					<div className="flex flex-col gap-1 text-slate-300">
 						<div>
 							Suas Cartas:
 							<div className="row-span-1 flex items-center justify-center">
 								{cards?.map((c: { code: null | undefined; url_image: string }) => (
-									<div key={c.code}>
-										<img className="img-responsive" src={c.url_image} />
-									</div>
+									<img key={c.code} className="w-16 pl-2 pr-2 md:w-32" src={c.url_image} />
 								))}
 							</div>
 						</div>
@@ -657,7 +695,7 @@ export default function gameRoom() {
 							<div className="row-span-1 flex items-center justify-center">
 								{partnerCards?.map((c: { code: null | undefined; url_image: string }) => (
 									<div key={c.code}>
-										<img className="img-responsive" src={c.url_image} />
+										<img className="w-16 pl-2 pr-2 md:w-32" src={c.url_image} />
 									</div>
 								))}
 							</div>
