@@ -500,7 +500,7 @@ export default function gameRoom() {
 													className="flex rounded-full bg-blue-500 p-3 text-gray-50 shadow-sm focus-within:bg-blue-700 focus-within:outline hover:bg-blue-600 disabled:bg-gray-500"
 													type="button"
 													onClick={callTruco}
-													disabled={!myTurn || waitingAcceptTruco || roundValue > 10 || playerCalledTrick}
+													disabled={!myTurn || waitingAcceptTruco || roundValue > 10 || playerCalledTrick || teamPoints[TEAM_1]?.points >= 10 || teamPoints[TEAM_2]?.points >= 10}
 												>
 													{(() => {
 														switch (roundValue) {
@@ -660,14 +660,12 @@ export default function gameRoom() {
 					<DialogHeader>
 						<DialogTitle className="text-slate-100">Mão de 10</DialogTitle>
 					</DialogHeader>
-					<div className="flex flex-col gap-3 py-4 text-slate-300">
+					<div className="flex flex-col gap-1 py-4 text-slate-300">
 						<div>
 							Suas Cartas:
 							<div className="row-span-1 flex items-center justify-center">
 								{cards?.map((c: { code: null | undefined; url_image: string }) => (
-									<div key={c.code}>
-										<img className="img-responsive" src={c.url_image} />
-									</div>
+									<img key={c.code} className="w-16 md:w-32 pr-2 pl-2" src={c.url_image} />
 								))}
 							</div>
 						</div>
@@ -676,7 +674,7 @@ export default function gameRoom() {
 							<div className="row-span-1 flex items-center justify-center">
 								{partnerCards?.map((c: { code: null | undefined; url_image: string }) => (
 									<div key={c.code}>
-										<img className="img-responsive" src={c.url_image} />
+										<img className="w-16 md:w-32 pr-2 pl-2" src={c.url_image} />
 									</div>
 								))}
 							</div>
