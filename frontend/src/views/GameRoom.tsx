@@ -287,27 +287,29 @@ export default function gameRoom() {
 				event.data.message = "O adversário venceu a mão!"
 			}
 
-			setTeamPoints(
-				teamPoints?.map((team) => {
-					const currentIndex = team.id - 1
-					if (team.id == data["winner"]) {
-						team.points = data["game_score"][currentIndex]
-						return team
-					}
-					return team
-				}),
-			)
-
 			setChatEvent(event)
 			setTimeout(() => {
 				setChatEvent({ event: "", data: {} })
 			}, 1000)
 
 			if (data["game_score"][0] == 0 && data["game_score"][1] == 0) {
+				teamPoints.forEach((team: any) => {console.log(team.points)})
+
 				if (teamPoints.some((team: any) => team.points == 0)) {
 					playAudio("sounds/ao-potencia.mp3")
 				}
 				resetGlobalScore(data["overall_score"])
+			} else {
+				setTeamPoints(
+					teamPoints?.map((team) => {
+						const currentIndex = team.id - 1
+						if (team.id == data["winner"]) {
+							team.points = data["game_score"][currentIndex]
+							return team
+						}
+						return team
+					}),
+				)
 			}
 
 			setWaitingPartnerTruco(false)
