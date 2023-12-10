@@ -31,28 +31,12 @@ export default function gameRoom() {
 	const [tableOrder, setTableOrder] = useState<any[]>([])
 	const [turn, setTurn] = useState<number>(0)
 	const [myTurn, setMyTurn] = useState(roundOrder?.length > 0 && player?.name === roundOrder[turn])
-	const [TRICK_AUDIO] = useState(8)
-	const [SIX_AUDIO] = useState(1)
-	const [NINE_AUDIO] = useState(1)
-	const [TWELVE_AUDIO] = useState(1)
-	const [PLAYER_POSITION_BOTTOM] = useState(0)
-	const [PLAYER_POSITION_RIGHT] = useState(1)
-	const [PLAYER_POSITION_TOP] = useState(2)
-	const [PLAYER_POSITION_LEFT] = useState(3)
 	const [roundValue, setRoundValue] = useState(2)
-	const [TEAM_1] = useState(0)
-	const [TEAM_2] = useState(1)
 	const [teamPoints, setTeamPoints] = useState<any[]>([
 		{ id: 1, points: 0, games: 0 },
 		{ id: 2, points: 0, games: 0 },
 	])
 	const [proposedHandValue, setProposedHandValue] = useState(2)
-	const [NULL_POINT] = useState(0)
-	const [TEAM_POINT] = useState(1)
-	const [OPPONENT_POINT] = useState(2)
-	const [DRAW_POINT] = useState(3)
-	const [POINT_IMAGE] = useState("-point.svg")
-	const [handPoints, setHandPoints] = useState<number[]>([NULL_POINT, NULL_POINT, NULL_POINT])
 	const [round, setRound] = useState(0)
 	const [playerCalledTrick, setPlayerCalledTrick] = useState(false)
 	const [chatEvent, setChatEvent] = useState<EventData>({
@@ -60,6 +44,24 @@ export default function gameRoom() {
 		data: {},
 	})
 	const [showTenHandDialog, setShowTenHandDialog] = useState(false)
+	const TRICK_AUDIO = 8
+	const SIX_AUDIO = 1
+	const NINE_AUDIO = 1
+	const TWELVE_AUDIO = 1
+	const TRICK_ACCEPTED_AUDIO = 1
+	const TRICK_DECLINED_AUDIO = 1
+	const PLAYER_POSITION_BOTTOM = 0
+	const PLAYER_POSITION_RIGHT = 1
+	const PLAYER_POSITION_TOP = 2
+	const PLAYER_POSITION_LEFT = 3
+	const TEAM_1 = 0
+	const TEAM_2 = 1
+	const NULL_POINT = 0
+	const TEAM_POINT = 1
+	const OPPONENT_POINT = 2
+	const DRAW_POINT = 3
+	const POINT_IMAGE = "-point.svg"
+	const [handPoints, setHandPoints] = useState<number[]>([NULL_POINT, NULL_POINT, NULL_POINT])
 
 	const toggleChat = () => {
 		const chat = document.querySelector("#chat")
@@ -191,6 +193,7 @@ export default function gameRoom() {
 			setRoundValue(data["new_hand_value"])
 			if (waitingAcceptTruco) {
 				setWaitingAcceptTruco(false)
+				playAudio(`sounds/truco-aceite-${Math.floor(Math.random() * TRICK_ACCEPTED_AUDIO)}.mp3`)
 
 				const event = {
 					event: "chat_accepted_truco",
@@ -227,6 +230,8 @@ export default function gameRoom() {
 			console.log("declined_truco", data)
 			if (waitingAcceptTruco) {
 				setWaitingAcceptTruco(false)
+				playAudio(`sounds/truco-recusa-${Math.floor(Math.random() * TRICK_DECLINED_AUDIO)}.mp3`)
+
 				const event = {
 					event: "chat_declined_truco",
 					data: {
