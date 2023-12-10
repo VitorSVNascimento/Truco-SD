@@ -167,6 +167,7 @@ def trigger_call_truco(id, player: Player):
                 if isinstance(player_analizing_truco, Bot):
                     if not game_list.games[id - 1].current_hand.waiting_truco:
                         return
+                    sleep(BOT_WAIT_TIME_TO_PLAY)
                     result,hand_result = game_list.games[id - 1].truco_response(player_analizing_truco.bot_get_response_truco(), player_analizing_truco)
                     trigger_truco_response_event(player_analizing_truco,result, hand_result, player_analizing_truco.bot_get_response_truco(), id)
 
