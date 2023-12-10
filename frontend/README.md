@@ -4,7 +4,6 @@
 
 - Node.js
 - NPM
-- TypeScript
 
 ## Recomendações
 
