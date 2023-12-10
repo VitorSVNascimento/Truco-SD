@@ -1,4 +1,6 @@
-# Frontend Chat App
+# Frontend Truco-SD
+
+Desenvolvido utilizando [Vite](https://vitejs.dev/), [React](https://reactjs.org/), [TailwindCSS](https://tailwindcss.com/) e [shadcn/ui](https://ui.shadcn.com/).
 
 ## Requisitos
 
@@ -9,6 +11,7 @@
 
 - Utilizar a extensão do VS Code: ESLint
 - Utilizar a extensão do VS Code: Prettier - Code formatter
+- Utilizar a extensão do VS Code: Tailwind CSS Intellisense
 
 ## Como rodar
 
