@@ -17,7 +17,8 @@
   ## Resultados do Projeto
    - A seguir apresentaremos algumas imagens e vídeo do jogo de truco funcionando.
    - Tela de login
-     <img src="" width="980px">
+     
+     <img src="https://github.com/VitorSVNascimento/Truco-SD/blob/main/Imagens_Truco/tela_login_truco.jpeg" width="980px">
 
    - Tela do jogo.
 
