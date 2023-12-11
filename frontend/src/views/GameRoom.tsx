@@ -45,11 +45,11 @@ export default function gameRoom() {
 	})
 	const [showTenHandDialog, setShowTenHandDialog] = useState(false)
 	const TRICK_AUDIO = 8
-	const SIX_AUDIO = 1
-	const NINE_AUDIO = 1
-	const TWELVE_AUDIO = 1
+	const SIX_AUDIO = 5
+	const NINE_AUDIO = 4
+	const TWELVE_AUDIO = 4
 	const TRICK_ACCEPTED_AUDIO = 1
-	const TRICK_DECLINED_AUDIO = 1
+	const TRICK_DECLINED_AUDIO = 4
 	const PLAYER_POSITION_BOTTOM = 0
 	const PLAYER_POSITION_RIGHT = 1
 	const PLAYER_POSITION_TOP = 2
@@ -293,8 +293,6 @@ export default function gameRoom() {
 			}, 1000)
 
 			if (data["game_score"][0] == 0 && data["game_score"][1] == 0) {
-				teamPoints.forEach((team: any) => {console.log(team.points)})
-
 				if (teamPoints.some((team: any) => team.points == 0)) {
 					playAudio("sounds/ao-potencia.mp3")
 				}
