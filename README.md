@@ -22,14 +22,15 @@
 
   ## Um pouco mais sobre o densenvolvimento do Projeto (Parte mais técnica)
    - Na tabela a seguir será feita a exblicação de como resolvemos os requisitos mencionados na Proposta do projeto.
-     | | ÁREA | DESCRIÇÃO | |
-     | --- | --- | --- | --- |
-     ||  |  ||
-     ||  | ||
-     ||  | ||
-     || |  ||
-     ||  |  ||
-     ||  |  ||
+     
+      | | ÁREA | DESCRIÇÃO | |
+      | --- | --- | --- | --- |
+      || Interface Gráfica | Resolvemos fazer a interface web utilizando: <br> - TailwindCSS<br> -Shadcn/ui<br> - Vite <br>- React <br> Para a utilização da interface siga os passos descritos neste link: (FrontEnd) [] ||
+      || Comunicação | A comunicação foi feita através de socketsIO ||
+      || Arquitetura | A arquitetura escolhida foi Cliente-servidor ||
+      || Recuperação de erros | ||
+      || Bots |||
+      || Execução do Truco | ||
 
   ## Colaboradores do Projeto
    - A seguir a tabela contém um link para o repositório de todos os colaboradores desse projeto.
