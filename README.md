@@ -22,7 +22,7 @@
 
    - Tela do jogo.
 
-     <img src="" width="980px">
+     <img src="https://github.com/VitorSVNascimento/Truco-SD/blob/main/Imagens_Truco/jogo_truco.jpeg" width="980px">
    - Caso queira saber mais sobre o funcionamento do nosso jogo de truco clique no link a seguir para ser direcionado para o nosso site de apresentação: [Site de Apresentaçãp](https://vitorsvnascimento.github.io/Truco-SD-Site-Apresentacao/)
 
   ## Um pouco mais sobre o densenvolvimento do Projeto (Parte mais técnica)
