@@ -41,7 +41,7 @@
       || Arquitetura | A arquitetura escolhida foi Cliente-servidor. ||
       || Recuperação de erros | FrontEnd e BackEnd trataram a possível desconexão dos jogadores. ||
       || Bots | Foram feitos os bots com possíbilidade de vários nomes diferentes, eles avaliam as chances de ter uma carta na mão que possa ganhar a partida. ||
-      || Execução do Truco | Tanto a parte de frontEnd quanto a de BackEnd foram realizadas conforme os requisitos solicitados acima, criamos vários eventos que ajudam na execução com (criação, sala de espera, truco, ganhadores, bots, dentro outros). ||
+      || Execução do Truco | Tanto a parte de frontEnd quanto a de BackEnd foram realizadas conforme os requisitos solicitados acima, criamos vários eventos que ajudam na execução do jogo (criação, sala de espera, truco, ganhadores, bots, dentro outros). ||
 
   ## Colaboradores do Projeto
    - A seguir a tabela contém um link para o repositório de todos os colaboradores desse projeto.
