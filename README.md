@@ -24,9 +24,10 @@
 
      <img src="https://github.com/VitorSVNascimento/Truco-SD/blob/main/Imagens_Truco/jogo_truco.jpeg" width="980px">
 
-    - A seguir temos um pequeno vídeo mostrando mais o funcionamento do jogo.
+   - A seguir temos um pequeno vídeo mostrando mais o funcionamento do jogo.
     
  https://github.com/VitorSVNascimento/Truco-SD/assets/129966396/87f69335-e553-477a-a5ce-60b9fc1a9d10
+
 
    - Caso queira saber mais sobre o funcionamento do nosso jogo de truco clique no link a seguir para ser direcionado para o nosso site de apresentação: [Site de Apresentaçãp](https://vitorsvnascimento.github.io/Truco-SD-Site-Apresentacao/)
 
