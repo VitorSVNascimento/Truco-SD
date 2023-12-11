@@ -16,9 +16,13 @@
   
   ## Resultados do Projeto
    - A seguir apresentaremos algumas imagens e vídeo do jogo de truco funcionando.
+   - Tela de login
      <img src="" width="980px">
+
+   - Tela do jogo.
+
      <img src="" width="980px">
-   - Caso queira saber mais sobre o funcionamento do nosso jogo de truco clique no link a seguir:
+   - Caso queira saber mais sobre o funcionamento do nosso jogo de truco clique no link a seguir para ser direcionado para o nosso site de apresentação: [Site de Apresentaçãp](https://vitorsvnascimento.github.io/Truco-SD-Site-Apresentacao/)
 
   ## Um pouco mais sobre o densenvolvimento do Projeto (Parte mais técnica)
    - Na tabela a seguir será feita a exblicação de como resolvemos os requisitos mencionados na Proposta do projeto.
@@ -26,11 +30,11 @@
       | | ÁREA | DESCRIÇÃO | |
       | --- | --- | --- | --- |
       || Interface Gráfica | Resolvemos fazer a interface web utilizando: <br> - TailwindCSS<br> -Shadcn/ui<br> - Vite <br>- React <br> Para a utilização da interface siga os passos descritos neste link: [FrontEnd](https://github.com/VitorSVNascimento/Truco-SD/tree/main/frontend) ||
-      || Comunicação | A comunicação foi feita através de socketsIO ||
-      || Arquitetura | A arquitetura escolhida foi Cliente-servidor ||
-      || Recuperação de erros | ||
-      || Bots |||
-      || Execução do Truco | ||
+      || Comunicação | A comunicação foi feita através de socketsIO. ||
+      || Arquitetura | A arquitetura escolhida foi Cliente-servidor. ||
+      || Recuperação de erros | FrontEnd e BackEnd trataram a possível desconexão dos jogadores. ||
+      || Bots | Foram feitos os bots com possíbilidade de vários nomes diferentes, eles avaliam as chances de ter uma carta na mão que possa ganhar a partida. ||
+      || Execução do Truco | Tanto a parte de frontEnd quanto a de BackEnd foram realizadas conforme os requisitos solicitados acima, criamos vários eventos que ajudam na execução com (criação, sala de espera, truco, ganhadores, bots, dentro outros). ||
 
   ## Colaboradores do Projeto
    - A seguir a tabela contém um link para o repositório de todos os colaboradores desse projeto.
