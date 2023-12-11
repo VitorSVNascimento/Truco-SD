@@ -25,7 +25,7 @@
      
       | | ÁREA | DESCRIÇÃO | |
       | --- | --- | --- | --- |
-      || Interface Gráfica | Resolvemos fazer a interface web utilizando: <br> - TailwindCSS<br> -Shadcn/ui<br> - Vite <br>- React <br> Para a utilização da interface siga os passos descritos neste link: (FrontEnd) [] ||
+      || Interface Gráfica | Resolvemos fazer a interface web utilizando: <br> - TailwindCSS<br> -Shadcn/ui<br> - Vite <br>- React <br> Para a utilização da interface siga os passos descritos neste link: (FrontEnd) [https://github.com/VitorSVNascimento/Truco-SD/tree/main/frontend] ||
       || Comunicação | A comunicação foi feita através de socketsIO ||
       || Arquitetura | A arquitetura escolhida foi Cliente-servidor ||
       || Recuperação de erros | ||
